@@ -9,7 +9,7 @@ conda install -n scRNA -c r r-irkernel
 conda install -n scRNA -c bioconda r-seurat
 conda install -n scRNA -c hcc cellranger
 ```
-The first steps will follow the recommended pipeline from (Cell Ranger)[https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_ov].
+The first steps will follow the recommended pipeline from [Cell Ranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_ov).
 First, trim align fastq files to the reference genome (GRCh38).
 
 

@@ -21,7 +21,7 @@ Next add the path with the CellRanger executable to your PATH. **NOTE: you will 
 export PATH=/rds/general/user/hm1412/home/anaconda3/envs/scRNA2/bin/cellranger-6.1.2:$PATH
 ```
 
-2. Generate a reference transcriptome
+### 2. Generate a reference transcriptome
 
 
 The first steps will follow the recommended pipeline from [Cell Ranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_ov).

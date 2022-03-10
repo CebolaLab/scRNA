@@ -23,7 +23,6 @@ export PATH=/rds/general/user/hm1412/home/anaconda3/envs/scRNA2/bin/cellranger-6
 
 ### 2. Generate a reference transcriptome
 
-
 The first steps will follow the recommended pipeline from [Cell Ranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_ov).
 
 `cellranger count` will require a transcriptome reference. You can download the prebuilt reference. However, here we will compile our own using our preferred versions of the reference genome and gene annotation:
@@ -43,6 +42,8 @@ gtf_in=gencode.v36.annotation.gtf
 # Create reference package
 cellranger mkref --ref-version="$version" --genome="$genome" --fasta="$fasta_in" --genes="$gtf_in"
 ```
+
+### 3. Cellranger count
 
 To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. SRR10009414_S1_L00X_R1_001.fastq.gz (and the corresponding R2). 
 

@@ -1,8 +1,12 @@
 ### 1. Introduction
 
-This Github describes the Cebola Lab pipeline with which to analyse single-cell RNA-seq data (scRNA-seq) from 10X Genomics. 
+This Github describes the pipeline used by the Cebola Lab to analyse single-cell RNA-seq data (scRNA-seq) from 10X Genomics. 
 
 There are several alignment algorithms to choose from, including CellRanger, STARsolo, Alevin, Alevin-fry and Kallisto; these are compared in [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741). This pipeline will use CellRanger (STARsolo may be an avisable alternative if memory requirement is an issue).
+
+The above tools generate a 'count matrix', which contains counts of reads for each gene, per-cell. The secondary analysis includes several steps, and different labs use slightly different approaches. Here are some examples:
+
+- [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) filter cells using the R packages DropletUtils and then use Seurat for downstream analysis, retaining cells with gene counts \>200 and \<2,500 and a mitochondrial content \<10%.
 
 ### 2. Installations
 

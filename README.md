@@ -1,4 +1,10 @@
-### 1. Installations
+### 1. Introduction
+
+This Github describes the Cebola Lab pipeline with which to analyse single-cell RNA-seq data (scRNA-seq) from 10X Genomics. 
+
+There are several alignment algorithms to choose from, including CellRanger, STARsolo, Alevin, Alevin-fry and Kallisto; these are compared in [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741). This pipeline will use CellRanger (STARsolo may be an avisable alternative if memory requirement is an issue).
+
+### 2. Installations
 
 This pipeline will process data from Chromium Single Cell A Chip Kit (10X Genomics) using Seurat v4 and Cell Ranger v6.1.
 
@@ -45,9 +51,10 @@ cellranger mkref --ref-version="$version" --genome="$genome" --fasta="$fasta_in"
 
 ### 3. Cellranger count
 
-To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. SRR10009414_S1_L00X_R1_001.fastq.gz (and the corresponding I1 and R2). The below command should be run, where `<ID>` is the sample ID at the start of the filename (e.g. SRR10009414) and the `<PATH>` should direct to the reference directory created by the previous command.
+To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. `SRR10009414_S1_L00X_R1_001.fastq.gz` (and the corresponding `I1` and `R2`). The below command should be run, where `<ID>` is the sample ID at the start of the filename (e.g. SRR10009414) and the `<PATH>` should direct to the reference directory created by the previous command.
 
 ```bash
+#Run cellranger count with the sampleID and cellranger reference directory
 cellranger count --id <ID> --transcriptome <PATH>
 
 #If working with public data i.e. pre-computed clusters:

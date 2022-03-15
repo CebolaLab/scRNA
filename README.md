@@ -2,28 +2,28 @@
 
 This Github describes the pipeline used by the Cebola Lab to analyse single-cell RNA-seq data (scRNA-seq) from 10X Genomics. 
 
-# Alignment and quantification
+#### Alignment and quantification
 
 There are several alignment algorithms to choose from, including CellRanger, STARsolo, Alevin, Alevin-fry and Kallisto; these are compared in [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741). This pipeline will use CellRanger (STARsolo may be an avisable alternative if memory requirement is an issue).
 
-# Secondary analysis
+#### Secondary analysis
 
 The above tools generate a 'count matrix', which contains counts of reads for each gene, per-cell. The secondary analysis includes several steps, and different labs use slightly different approaches. Here are some examples:
 
 - [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) filter cells using the R packages DropletUtils and then use Seurat for downstream analysis, retaining cells with gene counts \>200 and \<2,500 and a mitochondrial content \<10%.
 -
 
-# Dataset integration
+#### Dataset integration
 
 Integrating multiple scRNA-seq datasets presents an additional challenge, which may again be tackled with different methods:
 
 - [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) integrate expression matrices using Suerat, including: normalization with the `SCTransform` function, rank the features using the `SelectIntegrationFeatures` function, with the resulting features controlled using the function `PrepSCTIntegration`. Anchors were determined by `FindIntegrationAnchors` and afterwards used with the `IntegrateData` function. 
 
-# Clustering and assigning cell types
+#### Clustering and assigning cell types
 
 Then, UMAP was run with the first 20 PCs and clusters determined with `FindClusters`.
 
-# Differential expression
+#### Differential expression
 
 ### 2. Installations
 

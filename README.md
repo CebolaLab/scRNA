@@ -5,18 +5,26 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 
 This pipeline has been developed by carefully reviewing the literature for current tools and pipelines used in the analysis of 10X Genomics scRNA-seq data. This introduction presents an overview of various approaches used to analysis scRNA data, which is followed by the Cebola Lab pipeline.
 
-#### Alignment and quantification
+A 2019 effort to compile current best practises in scRNA-seq is published by [Leucken and Theis (2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746). 
 
-There are several alignment algorithms to choose from, including CellRanger, STARsolo, Alevin, Alevin-fry and Kallisto; these are compared in [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741). This pipeline will use **CellRanger** (STARsolo may be an avisable alternative if memory requirement is an issue).
+#### Alignment, demultiplexing and quantification
+
+There are several alignment algorithms to choose from, including CellRanger, STARsolo, Alevin, Alevin-fry and Kallisto; these are compared in [Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741). This pipeline will use **CellRanger**, which is the analysis toolbox from 10X Genomics ([Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) suggest STARsolo as an avisable alternative if memory requirement is an issue).
+
+CellRanger includes the demultiplexing of reads based on unique barcodes, which should correspond to unique cells following secondary filtering and QC. 
 
 #### Secondary analysis
 
-The above tools generate a 'count matrix', which contains counts of reads for each gene, per-cell. The secondary analysis includes several steps, and different labs use slightly different approaches. Here are some examples:
+The above tools generate a 'count matrix', which contains counts of reads for each gene, per-cell. The count matrices then undergo secondary analysis, including QC and filtering. The aim is to remove instances of droplets or "GEMs" (Gel Beads in EMulsion) with more or less than one cell. Filtering typically remove barcodes based on three typical QC measures: (1) the number of read counts per barcode, (2) the number of genes detected per barcode, and (3) the proportion of mitochondrial DNA.
+
+The thresholds will be specific to the distribution of reads in your data, with the aim of removing barcodes with outliers. For example, [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) retained cells with gene counts \>200 and \<2,500 and a mitochondrial content \<10%. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) retained cells with >30000 UMIs, 200-5000 genes, and less than 50% mitochondrial expression percentage. [Hardwick et al. (2022)](https://www.nature.com/articles/s41587-022-01231-3) excluded nuclei with unique gene counts >7,500 or <200 or >4% mitochondrial gene expression (note this is single-**nuclei** RNA-seq). 
+
+Some examples of tools available for secondary analysis are discussed below.
 
 - **Remove doublets** e.g. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) use `DoubletFinder` and then `decontX` of `celda` to correct for "cross containment".
-- **Filter cells**: different thresholds may be used, for example [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) filter cells using the R package `DropletUtils` and retain cells with gene counts \>200 and \<2,500 and a mitochondrial content \<10%. On the other hand, [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) retained cells with >30000 UMIs, 200-5000 genes, and less than 50% mitochondrial expression percentage. [Hardwick et al. (2022)](https://www.nature.com/articles/s41587-022-01231-3) excluded nuclei with unique gene counts >7,500 or <200 or >4% mitochondrial gene expression (note this is single-**nuclei** RNA-seq). 
+- **Filter cells**: different thresholds may be used, for example [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) filter cells using the R package `DropletUtils` 
 
-- **CellRanger** "the `cellranger reanalyze` command reruns secondary analysis performed on the feature-barcode matrix (dimensionality reduction, clustering and visualization) using different parameter settings."
+- **CellRanger**: cellranger also provides it's own tools for secondary analysis, the "`cellranger reanalyze` command reruns secondary analysis performed on the feature-barcode matrix (dimensionality reduction, clustering and visualization) using different parameter settings."
 
 #### Dataset integration
 

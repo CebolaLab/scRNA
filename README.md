@@ -50,6 +50,8 @@ Within-sample normalization aims to normalise counts across cells which can diff
 
 
 ![Figure 1 (Leuken and Theis, 2019)](https://github.com/CebolaLab/scRNA/blob/main/Figures/Leucken_Theis_Table1.png)
+Table 1 from [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746) summarises the types of data expected as input for downstream analysis.
+
 
 #### Dataset integration
 

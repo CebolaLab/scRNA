@@ -19,7 +19,7 @@ The above tools generate a 'count matrix', which contains counts of reads for ea
 
 The pipeline for secondary analysis, including references, is discussed below.
 
-1. **Empty droplets and ambient gene expression**. A proportion of the barcodes in the count matrix will correspond to empty droplets. A simple method to identify such droplets may use a minimum threshold of counts. However, this has the disadvantage of removing potential informative clusters of cells with low gene-expression levels, such as quiescent cells. More sophisticated methods make use of *ambient gene expression*, which refers to the background expression detected in all droplets, including empty droplets, from contaminating cell-free RNA. Modelling ambient gene expression in empty droplets can also allow other droplets to be corrected for contaminating counts, thus avoiding problems in downstream analysis and clustering. Several sophisticated methods exist with which to remove empty droplets and correct the remaining data for ambient or 'background' gene expression. Tools include **SoupX** [(Young and Behjati, 2020)](https://doi.org/10.1093/gigascience/giaa151), **EmptyDrops** [(Lun et al. 2019)](https://doi.org/10.1186%2Fs13059-019-1662-y) and **DEIM** [(Alvarez et al. 2020](https://www.nature.com/articles/s41598-020-67513-5) (note DEIM was designed for single-nuclei data, although shown to work with scRNA as well). Briefly, SoupX quantifies cell-free RNA contamination from the profiles of empty droplets and outputs background-corrected counts for the remaining GEMs. ... DEIM... *tbc*
+1. **Empty droplets and ambient gene expression**. A proportion of the barcodes in the count matrix will correspond to empty droplets. A simple method to identify such droplets may use a minimum threshold of counts. However, this has the disadvantage of removing potential informative clusters of cells with low gene-expression levels, such as quiescent cells. More sophisticated methods make use of *ambient gene expression*, which refers to the background expression detected in all droplets, including empty droplets, from contaminating cell-free RNA. Modelling ambient gene expression in empty droplets can also allow other droplets to be corrected for contaminating counts, thus avoiding problems in downstream analysis and clustering. Several sophisticated methods exist with which to remove empty droplets and correct the remaining data for ambient or 'background' gene expression. Tools include **SoupX** [(Young and Behjati, 2020)](https://doi.org/10.1093/gigascience/giaa151), **EmptyDrops** [(Lun et al. 2019)](https://doi.org/10.1186%2Fs13059-019-1662-y) and **DEIM** [(Alvarez et al. 2020](https://www.nature.com/articles/s41598-020-67513-5) (note DEIM was designed for single-nuclei data, although shown to work with scRNA as well). This pipeline will use SoupX. Briefly, SoupX quantifies cell-free RNA contamination from the profiles of empty droplets and outputs background-corrected counts for the remaining GEMs.
 
 2. **Outliers**. Common metrics used to filter uninformative GEMs such as damaged cells include the number of read counts and genes, as well as the % of mitochondrial DNA expression. For example, very high mtDNA expression can indicate cells where the cytoplasmic RNA leaked from the cell membrane, while gene expressed in little to no cells (gene-level filtering), will remove ininformative data. Earlier methods set hard cut-off thresholds, however this may remove meaningful biology, such as quiesent cells with low gene counts or highly active cells with a high level of mitochondria gene expression. 
 
@@ -46,12 +46,20 @@ Within-sample normalization aims to normalise counts across cells which can diff
 
 6. Imputation?
 
-7. **Feature selection, dimensionality reduction and visualisation**. Here, the data is filtered for informative genes, such as *highly variable genes* (HVGs), usually between 1,000 and 5,000. Tools for selecting HVGs are provided by Seurat and Scanpy, which bin genes by their mean expression and select genes with the highest variance-to-mean ratio. Make sure to check what type of data your method expects (e.g. raw count data or log-transformated data). For your final analysis, HVGs should be selected *after* normalization and pre-processing. (Note some tools select HVGs as part of the pre-processing step; these are not the same as your final list of HVGs which give your clusters).
+#### Downstream analysis
 
+7. **Feature selection, dimensionality reduction and visualisation**. 
+
+> Feature selection  
+Here, the data is filtered for informative genes, such as *highly variable genes* (HVGs), usually between 1,000 and 5,000. Tools for selecting HVGs are provided by Seurat and Scanpy, which bin genes by their mean expression and select genes with the highest variance-to-mean ratio. Make sure to check what type of data your method expects (e.g. raw count data or log-transformated data). For your final analysis, HVGs should be selected *after* normalization and pre-processing. (Note some tools select HVGs as part of the pre-processing step; these are not the same as your final list of HVGs which give your clusters).
+
+For dimensionaly reduction, UMAP is reported to be the optimal method over several other popular alternatives (e.g. t-SNE, PCA and MDS) [(Yang et al. 2021)](https://www.sciencedirect.com/science/article/pii/S2211124721008597)
+
+> Dimensionality reduction  
+**Clustering**. In the 2019 review by Leuken and Theis, the most popular method for clustering was **multi-resolution modularity optimization** algorithm as implemented in the Louvian algorithm. This algorithm detects groups of cells that have "more links between them than expected from the number of links the cells have in total". (Implemented by Seurat and Scanpy). 
 
 ![Figure 1 (Leuken and Theis, 2019)](https://github.com/CebolaLab/scRNA/blob/main/Figures/Leucken_Theis_Table1.png)
 Table 1 from [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746) summarises the types of data expected as input for downstream analysis.
-
 
 #### Dataset integration
 
@@ -84,6 +92,15 @@ A conda environment for the analysis can be created as follows:
 conda create -n scRNA -c conda-forge r-base r-essentials
 conda install -n scRNA -c r r-irkernel
 conda install -n scRNA -c bioconda r-seurat
+conda install -c r r-devtools
+#conda install -n scRNA2 -c conda-forge scvi-tools
+```
+
+In R:
+```R
+#Install DEIM
+library(devtools)
+devtools::install_github("marcalva/diem")
 ```
 
 You can install the latest version of Cell Ranger. To install Cell Ranger, you will need to register at [this link](https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/latest). 
@@ -132,7 +149,80 @@ cellranger count --id <ID> --transcriptome <PATH>
 cellranger count --nosecondary --id <ID> --transcriptome <PATH>
 ``` 
 
-## 4. Secondary analysis 
+## 4. Secondary analysis
+
+An overview of the secondary analysis steps:
+
+1. Read data into R
+2. Pre-processing and preliminary clustering
+2. `SoupX` to correct for ambient gene expression (vignette available [here](https://rawcdn.githack.com/constantAmateur/SoupX/204b602418df12e9fdb4b68775a8b486c6504fe4/inst/doc/pbmcTutorial.html))
+4. QC and removal of outlying clusters
+5. Repeat pre-processing and clustering
+3. `DoubletFinder` to identify and remove doublets
+4. Final round of processing and clustering 
+
+
+First, load the required R libraries:
+
+```R
+library(purrr)
+library(data.table)
+library(SoupX)
+library(dplyr)
+library(Seurat)
+library(patchwork)
+library(stringr)
+library(ggplot2)
+library(limma)
+library(DoubletFinder)
+```
+
+Read in the data, here shown for the example sample SRR10009414 from [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3):
+
+```R
+#Read in data for Seurat and create the object with some minimal filtering
+SRR10009414.data=Read10X("SRR10009414_control/outs/filtered_feature_bc_matrix/")
+
+# Initialize the Seurat object with the raw (non-normalized data).
+#Keep only features (genes) present in at least three cells and genes detected in at least 3 cells.
+SRR10009414_control <- CreateSeuratObject(counts = SRR10009414.data, project = "SRR10009414_control", min.cells = 3, min.features = 3)
+SRR10009414_control
+
+#Warning message:
+#“Feature names cannot have underscores ('_'), replacing with dashes ('-')”
+#An object of class Seurat 
+#18159 features across 1392 samples within 1 assay 
+#Active assay: RNA (18159 features, 0 variable features)
+```
+
+The output shows that there is `#18159 features across 1392 samples within 1 assay `, meaning 18,159 expressed genes and 1,392 cells.
+
+```R
+# The [[ operator can add columns to object metadata. This is a great place to stash QC stats
+SRR10009414_control[["percent.mt"]] <- PercentageFeatureSet(SRR10009414_control, pattern = "^MT-")
+# Visualize QC metrics as a violin plot
+VlnPlot(SRR10009414_control, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+```
+
+`SoupX` will be used to correct ambient gene expression. SoupX (and solo) requires clusters as input. Preliminary clustering should be carried out...
+
+
+Note, differential expression analysis expects the raw data as input, i.e. with the expected zero-inflation.... should empty droplets and doublets be removed before differential expression? They definitely should before visualisation...
+
+```R
+#Install SoupX using CRAN
+install.packages("SoupX")
+#Or the latest developers version directly from Github
+#devtools::install_github("constantAmateur/SoupX",ref='devel')
+
+library(SoupX)
+# Load data and estimate soup profile
+sc = load10X("Path/to/cellranger/outs/folder/")
+# Estimate rho
+sc = autoEstCont(sc)
+# Clean the data
+out = adjustCounts(sc)
+```
 
 `DropletUtils`
 

@@ -96,13 +96,6 @@ conda install -c r r-devtools
 #conda install -n scRNA2 -c conda-forge scvi-tools
 ```
 
-In R:
-```R
-#Install DEIM
-library(devtools)
-devtools::install_github("marcalva/diem")
-```
-
 You can install the latest version of Cell Ranger. To install Cell Ranger, you will need to register at [this link](https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/latest). 
 
 Create a folder to save the new CellRanger code, `cd` and run the `wget` or `curl` command provided following the registration. 
@@ -139,7 +132,7 @@ cellranger mkref --ref-version="$version" --genome="$genome" --fasta="$fasta_in"
 
 ## 3. Cellranger count
 
-To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. `SRR10009414_S1_L00X_R1_001.fastq.gz` (and the corresponding `I1` and `R2`). The below command should be run, where `<ID>` is the sample ID at the start of the filename (e.g. SRR10009414) and the `<PATH>` should direct to the reference directory created by the previous command.
+To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. `SRR10009414_S1_L00X_R1_001.fastq.gz` (and the corresponding `I1` and `R2`). The below command should be run, where `<ID>` is the sample ID at the start of the filename (e.g. SRR10009414) and the `<PATH>` should direct to the reference directory created by the previous command. Technical replicates should be combined here:
 
 ```bash
 #Run cellranger count with the sampleID and cellranger reference directory
@@ -147,6 +140,9 @@ cellranger count --id <ID> --transcriptome <PATH>
 
 #If working with public data i.e. pre-computed clusters:
 cellranger count --nosecondary --id <ID> --transcriptome <PATH>
+
+#Example for donor SAMN12614700, with four sets of fastq files from four runs in the SAMN12614700 directory:
+#cellranger count --nosecondary --id SAMN12614700 --sample SRR10009414,SRR10009415,SRR10009416,SRR10009417 --transcriptome $GENOMEDIR/GRCh38 --fastqs SAMN12614700/
 ``` 
 
 ## 4. Secondary analysis
@@ -395,7 +391,20 @@ df[, 2:3] %>% map( ~ {
 })
 ```
 
-![doublet_bar](https://github.com/CebolaLab/scRNA/blob/main/Figures/doublet_bar.png)
+Remove doublets and repeat the clustering:
+
+```R
+#Remove the doublets, keeping only Singlets
+SRR10009414_control.noSoup.Singlet.SCT=subset(x = SRR10009414_control.noSoup.SCT, subset = DF.classifications_0.25_0.09_90 == 'Singlet')
+#Repeat the dimensionality reduction
+SRR10009414_control.noSoup.Singlet.SCT <- RunPCA(object = SRR10009414_control.noSoup.Singlet.SCT, verbose = FALSE)
+SRR10009414_control.noSoup.Singlet.SCT <- RunUMAP(object = SRR10009414_control.noSoup.Singlet.SCT, dims = 1:20, verbose = FALSE)
+SRR10009414_control.noSoup.Singlet.SCT <- FindNeighbors(object = SRR10009414_control.noSoup.Singlet.SCT, dims = 1:20, verbose = FALSE)
+SRR10009414_control.noSoup.Singlet.SCT <- FindClusters(object = SRR10009414_control.noSoup.Singlet.SCT, verbose = FALSE)
+plot1 <- DimPlot(object = SRR10009414_control.noSoup.Singlet.SCT, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform. noSoup. noDoublet.")
+plot1
+```
+
 
 To check how many cells are in each cluster:
 ```R

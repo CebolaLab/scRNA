@@ -165,6 +165,11 @@ An overview of the secondary analysis steps:
 First, load the required R libraries:
 
 ```R
+#Install SoupX using CRAN
+#install.packages("SoupX")
+#Or the latest developers version directly from Github
+#devtools::install_github("constantAmateur/SoupX",ref='devel')
+library(SoupX)
 library(purrr)
 library(data.table)
 library(SoupX)
@@ -256,7 +261,35 @@ sc = load10X("SRR10009414_control/outs/")
 #Add the previously defined clusters and UMAP coordinates to this new data object.
 sc = setClusters(sc, setNames(metaData[rownames(sc$metaData),]$seurat_clusters, rownames(sc$metaData)))
 sc = setDR(sc, metaData[colnames(sc$toc), c("UMAP_1", "UMAP_2")])
+
+#Set "top" marker genes (here they are ordered by adjusted p-value)
+top.markers=SRR10009414.markers[order(SRR10009414.markers$p_val_adj),]
+sc = autoEstCont(sc,topMarkers = top.markers)
+# Estimate rho
+sc = autoEstCont(sc)
+# Clean the data
+out = adjustCounts(sc)
 ```
+
+The output data includes the genes whose contaminating reads make a significant contribution to the "soup", i.e. contribute the *ambient gene expression*. These will most likely include several mitochondrial genes.
+
+```R
+head(sc$soupProfile[order(sc$soupProfile$est, decreasing = TRUE), ], n = 20)
+plotMarkerDistribution(sc)
+```
+
+You can highlight cells within the UMAP plot where a gene is expressed *at all* vs expressed above the background. For example for the mitochondrial gene `MT-CO1`. 
+
+```R
+#Plot the expression of an example gene
+dd$CO1 = sc$toc["MT-CO1", ] #FCN1 is kupffer, CFTR is Cholangiocyte
+ggplot(dd, aes(UMAP_1, UMAP_2)) + geom_point(aes(colour = CO1 > 0))
+#CLEC4G PECAM1 LYVE1
+plotMarkerMap(sc, "MT-CO1",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
+```
+
+![MT-CO1_all](https://github.com/CebolaLab/scRNA/blob/main/Figures/MT-CO1.1.png)
+![MT-CO1_significant](https://github.com/CebolaLab/scRNA/blob/main/Figures/MT-CO1.2.png)
 
 
 Next, the quality of the data will be explored and some initial filtering carried out:
@@ -282,20 +315,6 @@ SRR10009414_control <- subset(SRR10009414_control, subset = percent.mt < 50)
 
 Note, differential expression analysis expects the raw data as input, i.e. with the expected zero-inflation.... should empty droplets and doublets be removed before differential expression? They definitely should before visualisation...
 
-```R
-#Install SoupX using CRAN
-install.packages("SoupX")
-#Or the latest developers version directly from Github
-#devtools::install_github("constantAmateur/SoupX",ref='devel')
-
-library(SoupX)
-# Load data and estimate soup profile
-sc = load10X("Path/to/cellranger/outs/folder/")
-# Estimate rho
-sc = autoEstCont(sc)
-# Clean the data
-out = adjustCounts(sc)
-```
 
 `DropletUtils`
 

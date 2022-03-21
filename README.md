@@ -177,25 +177,89 @@ library(limma)
 library(DoubletFinder)
 ```
 
-Read in the data, here shown for the example sample SRR10009414 from [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3):
+Read in the data filtered by CellRanger, here shown for the example sample SRR10009414 from [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3). All the cells will initially be included, in order to carry out normalization and preliminary clustering required for SoupX.
 
 ```R
-#Read in data for Seurat and create the object with some minimal filtering
+#Read in data for Seurat
 SRR10009414.data=Read10X("SRR10009414_control/outs/filtered_feature_bc_matrix/")
 
 #Initialize the Seurat object with the raw (non-normalized data).
 #Keep only features (genes) present in at least three cells and genes detected in at least 3 cells.
-SRR10009414_control <- CreateSeuratObject(counts = SRR10009414.data, project = "SRR10009414_control", min.cells = 3, min.features = 3)
+SRR10009414_control <- CreateSeuratObject(counts = SRR10009414.data, project = "SRR10009414_control", min.cells = 1, min.features = 1)
 SRR10009414_control
 
 #Warning message:
 #“Feature names cannot have underscores ('_'), replacing with dashes ('-')”
 #An object of class Seurat 
-#18159 features across 1392 samples within 1 assay 
+#24175 features across 1392 samples within 1 assay 
 #Active assay: RNA (18159 features, 0 variable features)
 ```
 
-The output shows that there is `#18159 features across 1392 samples within 1 assay`, meaning 18,159 expressed genes and 1,392 cells. Next, the quality of the data will be explored and some initial filtering carried out:
+The output shows that there is `#24175 features across 1392 samples within 1 assay`, meaning 24,175 expressed genes and 1,392 cells. 
+
+Next, an initial round of pre-processing will include normalization, clustering and marker gene identification. The normalization will be carried out using [`SCTransform`](https://satijalab.org/seurat/articles/sctransform_vignette.html), which normalizes using a negative binominal in place of a scale factor. SCTransform has been reported to recover improved biological meaning compared to log-normalization based on a scale factor. 
+
+```R
+#SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
+SRR10009414_control.SCT <- SCTransform(SRR10009414_control, conserve.memory=TRUE,return.only.var.genes=TRUE)
+#Carry out dimensionality reduction and clustering:
+SRR10009414_control.SCT <- RunPCA(object = SRR10009414_control.SCT, verbose = FALSE)
+SRR10009414_control.SCT <- RunUMAP(object = SRR10009414_control.SCT, dims = 1:20, verbose = FALSE)
+SRR10009414_control.SCT <- FindNeighbors(object = SRR10009414_control.SCT, dims = 1:20, verbose = FALSE)
+SRR10009414_control.SCT <- FindClusters(object = SRR10009414_control.SCT, verbose = FALSE)
+```
+
+Identify cluster marker genes:
+```R
+SRR10009414.markers <- FindAllMarkers(SRR10009414_control.SCT, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+markers=SRR10009414.markers %>%
+    group_by(cluster) %>%
+    slice_max(n = 5, order_by = avg_log2FC)
+```
+
+These initial clusters can be visualised in a UMAP plot. Note that these clusters form the temporary input to the next stage of analysis (`SoupX`) and are *not* the final clusters.
+
+```R
+#UMAP plot
+DimPlot(object = SRR10009414_control.SCT, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform")
+```
+
+![UMAP plot 1](https://github.com/CebolaLab/scRNA/blob/main/Figures/UMAP1.png)
+
+We will add the UMAP coordinates to the metaData so they can be read by SoupX:
+```R
+#Add the UMAP coordinates to the metaData for later compatability with SoupX
+umapCoord <- as.data.frame(Embeddings(object = SRR10009414_control.SCT[["umap"]]))
+
+#You can then add the PC columns to the meta.data as you please (cbind, sapply, paste(..,collapse=),...)
+metaData <- SRR10009414_control.SCT@meta.data
+
+metaData$UMI_id <- rownames(metaData)
+umapCoord$UMI_id <- rownames(umapCoord)
+
+metaData <- merge.data.frame(metaData,umapCoord,by = "UMI_id")
+metaData$UMI_id <- NULL
+rownames(metaData) = rownames(SRR10009414_control.SCT@meta.data)
+
+#Add the new dataframe to the object as metaData
+SRR10009414_control.SCT@meta.data <- metaData
+```
+
+### SoupX
+
+`SoupX` will be used to correct ambient gene expression. SoupX will read the data from CellRanger, including both the gene count matrices for the raw data (all droplets) and the filtered droplets. The raw data is used to estimate the contaminating gene counts, the *ambient gene expression*. The 'soup' model is created as part of the `load10X` command. 
+
+```R
+#Read in data for SoupX
+sc = load10X("SRR10009414_control/outs/")
+#sc contains droplets estimated by cellRanger to contain cells.
+#Add the previously defined clusters and UMAP coordinates to this new data object.
+sc = setClusters(sc, setNames(metaData[rownames(sc$metaData),]$seurat_clusters, rownames(sc$metaData)))
+sc = setDR(sc, metaData[colnames(sc$toc), c("UMAP_1", "UMAP_2")])
+```
+
+
+Next, the quality of the data will be explored and some initial filtering carried out:
 
 ```R
 # The [[ operator can add columns to object metadata. This is a great place to stash QC stats
@@ -214,25 +278,6 @@ Here, the data can be filtered to remove outliers. This pipeline will preferenti
 #Remove droplets with %mtDNA>50
 SRR10009414_control <- subset(SRR10009414_control, subset = percent.mt < 50)
 ```
-
-Next, the normalization will be carried out using [`SCTransform`](https://satijalab.org/seurat/articles/sctransform_vignette.html), which normalizes using a negative binominal in place of a scale factor. SCTransform has been reported to recover improved biological meaning compared to log-normalization based on a scale factor. 
-
-```R
-#SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
-SRR10009414_control.SCT <- SCTransform(SRR10009414_control, conserve.memory=TRUE,return.only.var.genes=TRUE)
-#Carry out dimensionality reduction and clustering:
-SRR10009414_control.SCT <- RunPCA(object = SRR10009414_control.SCT, verbose = FALSE)
-SRR10009414_control.SCT <- RunUMAP(object = SRR10009414_control.SCT, dims = 1:20, verbose = FALSE)
-SRR10009414_control.SCT <- FindNeighbors(object = SRR10009414_control.SCT, dims = 1:20, verbose = FALSE)
-SRR10009414_control.SCT <- FindClusters(object = SRR10009414_control.SCT, verbose = FALSE)
-
-#UMAP plot
-DimPlot(object = SRR10009414_control.SCT, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform")
-```
-
-![UMAP plot 1](https://github.com/CebolaLab/scRNA/blob/main/Figures/UMAP1.png)
-
-`SoupX` will be used to correct ambient gene expression. SoupX (and solo) requires clusters as input. Preliminary clustering should be carried out...
 
 
 Note, differential expression analysis expects the raw data as input, i.e. with the expected zero-inflation.... should empty droplets and doublets be removed before differential expression? They definitely should before visualisation...

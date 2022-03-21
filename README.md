@@ -318,9 +318,7 @@ SRR10009414_control.noSoup.SCT <- SCTransform(SRR10009414_control.noSoup, conser
 # The [[ operator can add columns to object metadata. This is a great place to stash QC stats
 SRR10009414_control.noSoup.SCT[["percent.mt"]] <- PercentageFeatureSet(SRR10009414_control.noSoup.SCT, pattern = "^MT-")
 # Visualize QC metrics as a violin plot
-#png('QC_plots1.png',width=8,height=5,unit='in',res=500)
 VlnPlot(SRR10009414_control.noSoup.SCT, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-#dev.off()
 ```
 
 ![QC1](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC1.png)
@@ -330,7 +328,11 @@ Here, the data can be filtered to remove outliers. This pipeline will preferenti
 ```R
 #Remove droplets with %mtDNA>50
 SRR10009414_control <- subset(SRR10009414_control, subset = percent.mt < 50)
+VlnPlot(SRR10009414_control.noSoup.SCT, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
+
+![QC1](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC2.png)
+
 
 
 Note, differential expression analysis expects the raw data as input, i.e. with the expected zero-inflation.... should empty droplets and doublets be removed before differential expression? They definitely should before visualisation...

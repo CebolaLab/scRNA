@@ -342,8 +342,60 @@ Next, doublets will be identified and removed by `doubletFinder`. (Note, you can
 ```R
 ## pK Identification (no ground-truth) 
 sweep.res.list_SRR10009414 <- paramSweep_v3(SRR10009414.NoSoup.no7.SCT, sct = TRUE, PCs = 1:20)
+
+## Homotypic Doublet Proportion Estimate 
+homotypic.prop <- modelHomotypic(SRR10009414_control.noSoup.SCT@meta.data$seurat_clusters)  ## ex: annotations <- seu_kidney@meta.data$ClusteringResults
+nExp_poi <- round(0.075*nrow(SRR10009414_control.noSoup.SCT@meta.data))  ## Assuming 7.5% doublet formation rate - tailor for your dataset
+nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
+
+## Run DoubletFinder with varying classification stringencies 
+SRR10009414_control.noSoup.SCT <- doubletFinder_v3(SRR10009414_control.noSoup.SCT, PCs = 1:16, pN = 0.25, pK = 0.09, nExp = nExp_poi, reuse.pANN = FALSE, sct = TRUE)
+
+#How many doublets?
+table(SRR10009414_control.noSoup.SCT@meta.data$DF.classifications_0.25_0.09_90)
+
+#Where are the doublets?
+DimPlot(SRR10009414_control.noSoup.SCT, group.by = "DF.classifications_0.25_0.09_90", pt.size = 0.01, cols = c("red", "azure3"))
+
+# check the nUMI for doublet and singlet
+VlnPlot(SRR10009414_control.noSoup.SCT,
+        features = "nCount_RNA",
+        pt.size = 0,
+        group.by = "DF.classifications_0.25_0.09_90") + NoLegend()
 ```
 
+This code from the scrublet vignette can show how many doublets were present per-cluster:
+```R
+#https://bookdown.org/ytliu13207/SingleCellMultiOmicsDataAnalysis/scrublet-doublet-validation.html
+df <- data.table(SRR10009414_control.noSoup.SCT@meta.data)
+sel.meta <- c("DF.classifications_0.25_0.09_90", "seurat_clusters", "orig.ident")
+df <- df[, sel.meta, with = FALSE]
+
+df[, 2:3] %>% map( ~ {
+  freq1 <- df[, .N, keyby = .(.x, DF.classifications_0.25_0.09_90)]
+  freq1[, total := sum(N), by = .(.x)]
+  freq1[, ratio := N / total]
+  
+  linesize = .35
+  fontsize = 8
+
+  ggplot(freq1, aes(fill=DF.classifications_0.25_0.09_90, y=ratio, x= .x)) + 
+    geom_bar(position="stack", stat="identity")+
+    scale_fill_manual(values = c("Doublet" = 'red', "Singlet" = "grey")) +
+    xlab('Cluster') +
+    scale_y_continuous(breaks = seq(0,1,0.1), expand = c(0,0), name = 'Percentage')+
+    theme_bw()+
+    theme( panel.grid.major.x = element_blank(), 
+           panel.grid.major.y = element_blank(),
+           panel.grid.minor = element_blank(),
+           strip.background = element_blank(),panel.border = element_rect(size = linesize),
+           axis.ticks = element_blank(), 
+           axis.text.x = element_text(size = 5))
+  
+})
+```
+
+![doublet_bar](https://github.com/CebolaLab/scRNA/blob/main/Figures/doublet_bar.png)
 
 To check how many cells are in each cluster:
 ```R

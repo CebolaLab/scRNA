@@ -327,16 +327,31 @@ Here, the data can be filtered to remove outliers. This pipeline will preferenti
 
 ```R
 #Remove droplets with %mtDNA>50
-SRR10009414_control <- subset(SRR10009414_control, subset = percent.mt < 50)
-VlnPlot(SRR10009414_control.noSoup.SCT, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+SRR10009414_control.noSoup.SCT <- subset(SRR10009414_control.noSoup.SCT, subset = percent.mt < 50)
+#Rerun dimensionality reduction
+SRR10009414_control.noSoup.SCT <- RunPCA(object = SRR10009414_control.noSoup.SCT, verbose = FALSE)
+SRR10009414_control.noSoup.SCT <- RunUMAP(object = SRR10009414_control.noSoup.SCT, dims = 1:20, verbose = FALSE)
+SRR10009414_control.noSoup.SCT <- FindNeighbors(object = SRR10009414_control.noSoup.SCT, dims = 1:20, verbose = FALSE)
+SRR10009414_control.noSoup.SCT <- FindClusters(object = SRR10009414_control.noSoup.SCT, verbose = FALSE)
 ```
 
-![QC1](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC2.png)
+## Remove doublets
+
+Next, doublets will be identified and removed by `doubletFinder`. (Note, you can check the number of informative dimensions with an ElbowPlot `ElbowPlot(SRR10009414_control.noSoup.SCT)`).
+
+```R
+## pK Identification (no ground-truth) 
+sweep.res.list_SRR10009414 <- paramSweep_v3(SRR10009414.NoSoup.no7.SCT, sct = TRUE, PCs = 1:20)
+```
 
 
+To check how many cells are in each cluster:
+```R
+#How many cells are in each cluster?
+table(Idents(object = SRR10009414_control.noSoup.SCT))
+```
 
-Note, differential expression analysis expects the raw data as input, i.e. with the expected zero-inflation.... should empty droplets and doublets be removed before differential expression? They definitely should before visualisation...
-
+* * * * * * * * * * * * * * * * * * * * * * * * * *
 
 `DropletUtils`
 

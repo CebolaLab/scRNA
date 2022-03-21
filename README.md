@@ -195,7 +195,7 @@ SRR10009414_control
 #Active assay: RNA (18159 features, 0 variable features)
 ```
 
-The output shows that there is `#18159 features across 1392 samples within 1 assay `, meaning 18,159 expressed genes and 1,392 cells.
+The output shows that there is `#18159 features across 1392 samples within 1 assay`, meaning 18,159 expressed genes and 1,392 cells.
 
 ```R
 # The [[ operator can add columns to object metadata. This is a great place to stash QC stats
@@ -203,6 +203,8 @@ SRR10009414_control[["percent.mt"]] <- PercentageFeatureSet(SRR10009414_control,
 # Visualize QC metrics as a violin plot
 VlnPlot(SRR10009414_control, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
+
+![QC plot 2](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC_plots1.png)
 
 `SoupX` will be used to correct ambient gene expression. SoupX (and solo) requires clusters as input. Preliminary clustering should be carried out...
 

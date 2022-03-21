@@ -288,10 +288,10 @@ ggplot(dd, aes(UMAP_1, UMAP_2)) + geom_point(aes(colour = CO1 > 0))
 plotMarkerMap(sc, "MT-CO1",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
 ```
 
-Cells where MT-CO1 is expressed at >1 count:
+Cells where MT-CO1 is expressed at >1 count:  
 ![MT-CO1_all](https://github.com/CebolaLab/scRNA/blob/main/Figures/MT-CO1.1.png)
 
-Cells where MT-CO1 is expressed significantly above the "soup" background:
+Cells where MT-CO1 is expressed significantly above the "soup" background:  
 ![MT-CO1_significant](https://github.com/CebolaLab/scRNA/blob/main/Figures/MT-CO1.2.png)
 
 

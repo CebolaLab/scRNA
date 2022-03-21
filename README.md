@@ -183,7 +183,7 @@ Read in the data, here shown for the example sample SRR10009414 from [Ramachandr
 #Read in data for Seurat and create the object with some minimal filtering
 SRR10009414.data=Read10X("SRR10009414_control/outs/filtered_feature_bc_matrix/")
 
-# Initialize the Seurat object with the raw (non-normalized data).
+#Initialize the Seurat object with the raw (non-normalized data).
 #Keep only features (genes) present in at least three cells and genes detected in at least 3 cells.
 SRR10009414_control <- CreateSeuratObject(counts = SRR10009414.data, project = "SRR10009414_control", min.cells = 3, min.features = 3)
 SRR10009414_control
@@ -195,7 +195,7 @@ SRR10009414_control
 #Active assay: RNA (18159 features, 0 variable features)
 ```
 
-The output shows that there is `#18159 features across 1392 samples within 1 assay`, meaning 18,159 expressed genes and 1,392 cells.
+The output shows that there is `#18159 features across 1392 samples within 1 assay`, meaning 18,159 expressed genes and 1,392 cells. Next, the quality of the data will be explored and some initial filtering carried out:
 
 ```R
 # The [[ operator can add columns to object metadata. This is a great place to stash QC stats
@@ -215,12 +215,22 @@ Here, the data can be filtered to remove outliers. This pipeline will preferenti
 SRR10009414_control <- subset(SRR10009414_control, subset = percent.mt < 50)
 ```
 
-Next, the normalization will be carried out using [`SCTransform`](https://satijalab.org/seurat/reference/sctransform), which normalizes using a negative binominal in place of a scale factor.
+Next, the normalization will be carried out using [`SCTransform`](https://satijalab.org/seurat/articles/sctransform_vignette.html), which normalizes using a negative binominal in place of a scale factor. SCTransform has been reported to recover improved biological meaning compared to log-normalization based on a scale factor. 
 
 ```R
 #SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
 SRR10009414_control.SCT <- SCTransform(SRR10009414_control, conserve.memory=TRUE,return.only.var.genes=TRUE)
+#Carry out dimensionality reduction and clustering:
+SRR10009414_control.SCT <- RunPCA(object = SRR10009414_control.SCT, verbose = FALSE)
+SRR10009414_control.SCT <- RunUMAP(object = SRR10009414_control.SCT, dims = 1:20, verbose = FALSE)
+SRR10009414_control.SCT <- FindNeighbors(object = SRR10009414_control.SCT, dims = 1:20, verbose = FALSE)
+SRR10009414_control.SCT <- FindClusters(object = SRR10009414_control.SCT, verbose = FALSE)
+
+#UMAP plot
+DimPlot(object = SRR10009414_control.SCT, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform")
 ```
+
+![UMAP plot 1](https://github.com/CebolaLab/scRNA/blob/main/Figures/UMAP1.png)
 
 `SoupX` will be used to correct ambient gene expression. SoupX (and solo) requires clusters as input. Preliminary clustering should be carried out...
 

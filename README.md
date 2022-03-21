@@ -291,22 +291,39 @@ plotMarkerMap(sc, "MT-CO1",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
 Cells where MT-CO1 is expressed at >1 count:  
 ![MT-CO1_all](https://github.com/CebolaLab/scRNA/blob/main/Figures/MT-CO1.1.png)
 
-Cells where MT-CO1 is expressed significantly above the "soup" background:  
+Cells where MT-CO1 has significant expression, above that of the background "soup" contamination in all cells:  
 ![MT-CO1_significant](https://github.com/CebolaLab/scRNA/blob/main/Figures/MT-CO1.2.png)
 
+Correct the count matrix for the ambient gene expresison and create a Seurat data object.
 
-Next, the quality of the data will be explored and some initial filtering carried out:
-
-```R
-# The [[ operator can add columns to object metadata. This is a great place to stash QC stats
-SRR10009414_control[["percent.mt"]] <- PercentageFeatureSet(SRR10009414_control, pattern = "^MT-")
-# Visualize QC metrics as a violin plot
-VlnPlot(SRR10009414_control, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-FeatureScatter(SRR10009414_control, feature1 = "nCount_RNA", feature2 = "percent.mt")
-FeatureScatter(SRR10009414_control, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+```R 
+out = adjustCounts(sc)
 ```
 
-![QC plot 2](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC_plots1.png)
+## Quality-control and filtering
+
+Using the new, background-corrected count matrix (`srat`), we will now explore the QC of the data and filter out low-quality cells and/or clusters. First, the initial pre-processing will be rerun:
+
+```R
+SRR10009414_control.noSoup <- CreateSeuratObject(counts = out, project = "SRR10009414_control", min.cells = 3, min.features = 100)
+SRR10009414_control.noSoup
+```
+
+We now have `18033 features across 1279 samples within 1 assay`.
+
+```R
+#SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
+SRR10009414_control.noSoup.SCT <- SCTransform(SRR10009414_control.noSoup, conserve.memory=TRUE,return.only.var.genes=TRUE)
+
+# The [[ operator can add columns to object metadata. This is a great place to stash QC stats
+SRR10009414_control.noSoup.SCT[["percent.mt"]] <- PercentageFeatureSet(SRR10009414_control.noSoup.SCT, pattern = "^MT-")
+# Visualize QC metrics as a violin plot
+#png('QC_plots1.png',width=8,height=5,unit='in',res=500)
+VlnPlot(SRR10009414_control.noSoup.SCT, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+#dev.off()
+```
+
+![QC1](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC1.png)
 
 Here, the data can be filtered to remove outliers. This pipeline will preferentially filter the data using clustering later on, but here we will remove cells with %mtDNA > 50%.
 

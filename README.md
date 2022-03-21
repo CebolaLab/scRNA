@@ -202,9 +202,25 @@ The output shows that there is `#18159 features across 1392 samples within 1 ass
 SRR10009414_control[["percent.mt"]] <- PercentageFeatureSet(SRR10009414_control, pattern = "^MT-")
 # Visualize QC metrics as a violin plot
 VlnPlot(SRR10009414_control, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+FeatureScatter(SRR10009414_control, feature1 = "nCount_RNA", feature2 = "percent.mt")
+FeatureScatter(SRR10009414_control, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 ```
 
 ![QC plot 2](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC_plots1.png)
+
+Here, the data can be filtered to remove outliers. This pipeline will preferentially filter the data using clustering later on, but here we will remove cells with %mtDNA > 50%.
+
+```R
+#Remove droplets with %mtDNA>50
+SRR10009414_control <- subset(SRR10009414_control, subset = percent.mt < 50)
+```
+
+Next, the normalization will be carried out using [`SCTransform`](https://satijalab.org/seurat/reference/sctransform), which normalizes using a negative binominal in place of a scale factor.
+
+```R
+#SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
+SRR10009414_control.SCT <- SCTransform(SRR10009414_control, conserve.memory=TRUE,return.only.var.genes=TRUE)
+```
 
 `SoupX` will be used to correct ambient gene expression. SoupX (and solo) requires clusters as input. Preliminary clustering should be carried out...
 

@@ -259,6 +259,8 @@ SAMN12614700@meta.data <- metaData
 head(SAMN12614700@meta.data)
 ```
 
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/metaData1.png" width="400">
+
 ### SoupX
 
 `SoupX` will be used to correct ambient gene expression. SoupX will read the data from CellRanger, including both the gene count matrices for the raw data (all droplets) and the filtered droplets. The raw data is used to estimate the contaminating gene counts, the *ambient gene expression*. The 'soup' model is created as part of the `load10X` command. 

@@ -3,7 +3,7 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 
 ## 1. Introduction
 
-This pipeline has been developed by carefully reviewing current tools and best practises used in the analysis of 10X Genomics scRNA-seq data, as of March 2022. This Github will first present an overview of various available tools, followed by the Cebola Lab pipeline. Resources used are shown in the References at the bottom of this page.
+This pipeline has been developed by carefully reviewing current tools and best practises used in the analysis of 10X Genomics scRNA-seq data, as of March 2022. This Github will first present an overview of various available tools, followed by the Cebola Lab pipeline. Resources used are shown in the [References](#references) at the bottom of this page.
 
 #### Alignment, demultiplexing and quantification
 

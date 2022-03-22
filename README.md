@@ -1,7 +1,15 @@
 # Analysis of 10X Genomics scRNA-seq data
 This Github describes the pipeline used by the Cebola Lab to analyse single-cell RNA-seq data (scRNA-seq) from 10X Genomics. 
 
-## 1. Introduction
+## 1. Pipeline overview
+
+1. **CellRanger count**: generate count matrices. Initial filtering to remove empty droplets. 
+2. **Seurat**: Read data into R, create Seurat object, merge technical replicates
+3. **SoupX**: carry out an initial round of normalization & clustering, then run `SoupX` to correct for ambient gene expression. 
+4. **QC filtering**: repeat the normalization and clustering with the corrected data. Identify and remove clusters of low-quality cells. Several rounds of pre-processing, clustering and filtering may be required.
+5. **DoubletFinder**: identify and remove droplets with doublets i.e. two (or more) cells.
+
+## 2. Background
 
 This pipeline has been developed by carefully reviewing current tools and best practises used in the analysis of 10X Genomics scRNA-seq data, as of March 2022. This Github will first present an overview of various available tools, followed by the Cebola Lab pipeline. Resources used are shown in the [References](#references) at the bottom of this page.
 

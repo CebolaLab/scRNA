@@ -11,9 +11,7 @@ There are several alignment algorithms to choose from, including CellRanger, STA
 
 #### Secondary analysis
 
-CellRanger includes the demultiplexing of reads from individual droplets, or 'GEMs' (Gel Beads in EMulsion), based on unique barcodes. These should /*in theory* correspond to unique cells. However, many droplets will be empty, or contain damaged or low quality cells. These will later be removed. 
-
-The output from the previous step is a count matrix, which contains counts of reads for each gene, per-cell. The count matrix then undergoes quality checks and filtering. The aim is to remove instances of droplets with more or less than one cell, damaged cells, or other uninformative data. 
+CellRanger includes the demultiplexing of reads from individual droplets, or 'GEMs' (Gel Beads in EMulsion), based on unique barcodes. These should correspond to unique single cells *in theory*. However, droplets can contain more or less than one cell, or contain damaged or low quality cells. Therefore, the secondary analysis will assess the quality of the dataset and filter the data to retain only droplets with high-quality single cells. 
 
 The pipeline for secondary analysis, including references, is discussed below.
 

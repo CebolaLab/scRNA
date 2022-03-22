@@ -5,9 +5,10 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 
 1. **Generate count matrix**: `CellRanger count` is used to generate count matrices with some initial filtering to remove empty droplets. 
 2. **Pre-processing**: the count matrix is read into R using `Seurat`.  Initial pre-processing is carried out to prepare the data for the next steps, including normalization with a negative binominal model (`SCTransform`), merging of technical replicates and initial dimensionality reduction and clustering using `RunPCA`, `RunUMAP`, `FindNeighbors` and `FindClusters`.
-3. **SoupX**: carry out an initial round of normalization & clustering, then run `SoupX` to correct for ambient gene expression. 
+3. **Correct for ambient gene expression** `SoupX` is used to correct for ambient gene expression. 
 4. **QC filtering**: repeat the normalization and clustering with the corrected data. Identify and remove clusters of low-quality cells. Several rounds of pre-processing, clustering and filtering may be required.
 5. **DoubletFinder**: identify and remove droplets with doublets i.e. two (or more) cells.
+6. **Identify final clustering**
 
 ## 2. Background
 

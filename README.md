@@ -6,6 +6,9 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 1. [Pipeline overview](#1-Pipeline-overview)  
 2. [Background](#2-Background)
 3. [Workspace setup](#3-Workspace-setup)
+4. [Generate a reference transcriptome](#2-Generate-a-reference-transcriptome)
+5. [Cellranger count](#5-Cellranger-count)
+
 
 ## 1. Pipeline overview
 
@@ -99,7 +102,7 @@ conda install -c r r-devtools
 
 You can install the latest version of Cell Ranger. To install Cell Ranger, you will need to register at [this link](https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/latest). 
 
-Create a folder to save the new CellRanger code, `cd` and run the `wget` or `curl` command provided following the registration. 
+Create a folder to save the new CellRanger code, `cd` and run the `wget` or `curl` command provided following the registration. Then:
 
 ```bash
 tar -zxvf cellranger-6.1.2.tar.gz
@@ -109,7 +112,7 @@ Next add the path with the CellRanger executable to your PATH. **NOTE: you will 
 export PATH=/rds/general/user/hm1412/home/anaconda3/envs/scRNA2/bin/cellranger-6.1.2:$PATH
 ```
 
-## 2. Generate a reference transcriptome
+## 4. Generate a reference transcriptome
 
 The first steps will follow the recommended pipeline from [Cell Ranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_ov).
 
@@ -131,7 +134,7 @@ gtf_in=gencode.v36.annotation.gtf
 cellranger mkref --ref-version="$version" --genome="$genome" --fasta="$fasta_in" --genes="$gtf_in"
 ```
 
-## 3. Cellranger count
+## 5. Cellranger count
 
 To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. `SRR10009414_S1_L00X_R1_001.fastq.gz` (and the corresponding `I1` and `R2`). The below command should be run, where `<ID>` is the sample ID at the start of the filename (e.g. SRR10009414) and the `<PATH>` should direct to the reference directory created by the previous command. **Technical replicates can be combined here, or in the next stage in R.**
 

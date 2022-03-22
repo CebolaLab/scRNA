@@ -314,7 +314,7 @@ head(sc.14$soupProfile[order(sc.14$soupProfile$est, decreasing = TRUE), ], n = 2
 plotMarkerDistribution(sc.14)
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/soup.png" height="500">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/soup.png" height="400">
 
 You can highlight cells within the UMAP plot where a gene is expressed *at all* vs expressed above the background. For example for the mitochondrial gene `MT-CO1`. 
 

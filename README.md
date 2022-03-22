@@ -3,9 +3,7 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 
 ## 1. Introduction
 
-This pipeline has been developed by carefully reviewing the literature for current tools and pipelines used in the analysis of 10X Genomics scRNA-seq data. This introduction presents an overview of various approaches used to analysis scRNA data, which is followed by the Cebola Lab pipeline.
-
-Resources used are shown in the References at the bottom of this page.
+This pipeline has been developed by carefully reviewing current tools and best practises used in the analysis of 10X Genomics scRNA-seq data, as of March 2022. This Github will first present an overview of various available tools, followed by the Cebola Lab pipeline. Resources used are shown in the References at the bottom of this page.
 
 #### Alignment, demultiplexing and quantification
 
@@ -132,7 +130,7 @@ cellranger mkref --ref-version="$version" --genome="$genome" --fasta="$fasta_in"
 
 ## 3. Cellranger count
 
-To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. `SRR10009414_S1_L00X_R1_001.fastq.gz` (and the corresponding `I1` and `R2`). The below command should be run, where `<ID>` is the sample ID at the start of the filename (e.g. SRR10009414) and the `<PATH>` should direct to the reference directory created by the previous command. Technical replicates should be combined here:
+To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. `SRR10009414_S1_L00X_R1_001.fastq.gz` (and the corresponding `I1` and `R2`). The below command should be run, where `<ID>` is the sample ID at the start of the filename (e.g. SRR10009414) and the `<PATH>` should direct to the reference directory created by the previous command. **Technical replicates can be combined here, or in the next stage in R.**
 
 ```bash
 #Run cellranger count with the sampleID and cellranger reference directory
@@ -182,18 +180,18 @@ Read in the data filtered by CellRanger, here shown for the example sample SRR10
 
 ```R
 #Read in data for Seurat
-SRR10009414.data=Read10X("SRR10009414_control/outs/filtered_feature_bc_matrix/")
+SAMN12614700.data=Read10X("SAMN12614700/outs/filtered_feature_bc_matrix/")
 
 #Initialize the Seurat object with the raw (non-normalized data).
-#Keep only features (genes) present in at least three cells and genes detected in at least 3 cells.
-SRR10009414_control <- CreateSeuratObject(counts = SRR10009414.data, project = "SRR10009414_control", min.cells = 1, min.features = 1)
-SRR10009414_control
+#No filtering at this stage
+SAMN12614700 <- CreateSeuratObject(counts = SAMN12614700.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
 
-#Warning message:
-#“Feature names cannot have underscores ('_'), replacing with dashes ('-')”
-#An object of class Seurat 
-#24175 features across 1392 samples within 1 assay 
-#Active assay: RNA (18159 features, 0 variable features)
+#To combine technical replicates:
+#SAMN12614700.data2=Read10X("SAMN12614700_2/outs/filtered_feature_bc_matrix/")
+#SAMN12614700.2 <- CreateSeuratObject(counts = SAMN12614700.data2, project = "SAMN12614700", min.cells = 1, min.features = 1)
+
+#SAMN12614700 <- merge(SAMN12614700, y = SAMN12614700.2, add.cell.ids = c("rep1", "rep1", project = "SAMN12614700")
+#SAMN12614700
 ```
 
 The output shows that there is `#24175 features across 1392 samples within 1 assay`, meaning 24,175 expressed genes and 1,392 cells. 
@@ -462,6 +460,7 @@ For single-nuclei RNA, [Hardwick et al. (2022)](https://www.nature.com/articles/
 # References
 
 - [Leucken and Theis (2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746): A 2019 effort to compile current best practises in scRNA-seq. This paper is very useful for "newbies" and gives an excellent overview of the essential steps of scRNA-seq analysis (note that some specific tools mentioned are superceeded by more recent published tools).
+- https://hbctraining.github.io/scRNA-seq/lessons/04_SC_quality_control.html
 
 e.g. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) use `DoubletFinder` and then `decontX` of `celda` to correct for "cross containment".
 3. **CellRanger**: cellranger also provides it's own tools for secondary analysis, the "`cellranger reanalyze` command reruns secondary analysis performed on the feature-barcode matrix (dimensionality reduction, clustering and visualization) using different parameter settings."

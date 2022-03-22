@@ -185,12 +185,15 @@ Read in the data filtered by CellRanger, here shown for the example donor SAMN12
 #Technical replicate 1
 SRR10009414.data=Read10X("SAMN12614700_male_healthy/SRR10009414_control/outs/filtered_feature_bc_matrix/")
 SRR10009414 <- CreateSeuratObject(counts = SRR10009414.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
+
 #Technical replicate 2
 SRR10009415.data=Read10X("SAMN12614700_male_healthy/SRR10009415_control/outs/filtered_feature_bc_matrix/")
 SRR10009415 <- CreateSeuratObject(counts = SRR10009415.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
+
 #Technical replicate 3
 SRR10009416.data=Read10X("SAMN12614700_male_healthy/SRR10009416_control/outs/filtered_feature_bc_matrix/")
 SRR10009416 <- CreateSeuratObject(counts = SRR10009416.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
+
 #Technical replicate 4
 SRR10009417.data=Read10X("SAMN12614700_male_healthy/SRR10009417_control/outs/filtered_feature_bc_matrix/")
 SRR10009417 <- CreateSeuratObject(counts = SRR10009417.data, project = "SAMN12614700", min.cells = 1, min.features = 1)

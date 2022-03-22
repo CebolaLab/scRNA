@@ -259,19 +259,39 @@ SAMN12614700@meta.data <- metaData
 head(SAMN12614700@meta.data)
 ```
 
+The UMAP coordinates for each barcode are in the UMAP_1 and UMAP_2 columns:
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/metaData1.png" width="800">
 
 ### SoupX
 
-`SoupX` will be used to correct ambient gene expression. SoupX will read the data from CellRanger, including both the gene count matrices for the raw data (all droplets) and the filtered droplets. The raw data is used to estimate the contaminating gene counts, the *ambient gene expression*. The 'soup' model is created as part of the `load10X` command. 
+`SoupX` will be used to correct ambient gene expression. SoupX will read the data from CellRanger, including both the gene count matrices for the raw data (all droplets) and the filtered droplets. The raw data is used to estimate the contaminating gene counts, the *ambient gene expression*. The 'soup' model is created as part of the `load10X` command and the raw counts are removed afterwards. SoupX will be run on each of the four technical replicates prior to merging the background-corrected gene count matrices:
 
 ```R
 #Read in data for SoupX
-sc = load10X("SRR10009414_control/outs/")
-#sc contains droplets estimated by cellRanger to contain cells.
-#Add the previously defined clusters and UMAP coordinates to this new data object.
-sc = setClusters(sc, setNames(metaData[rownames(sc$metaData),]$seurat_clusters, rownames(sc$metaData)))
-sc = setDR(sc, metaData[colnames(sc$toc), c("UMAP_1", "UMAP_2")])
+sc.14 = load10X("SAMN12614700_male_healthy/SRR10009414_control/outs/")
+sc.15 = load10X("SAMN12614700_male_healthy/SRR10009415_control/outs/")
+sc.16 = load10X("SAMN12614700_male_healthy/SRR10009416_control/outs/")
+sc.17 = load10X("SAMN12614700_male_healthy/SRR10009417_control/outs/")
+
+#Extract the metaData for each technical replicate 
+#Note - the metaData following merging from the initial pre-processing has the sampleID appended before the barcode
+sc14.meta=metaData[grep('SRR10009414',rownames(metaData)),]; rownames(sc14.meta)=gsub('SRR10009414_','',rownames(sc14.meta))
+sc15.meta=metaData[grep('SRR10009415',rownames(metaData)),]; rownames(sc15.meta)=gsub('SRR10009415_','',rownames(sc15.meta))
+sc16.meta=metaData[grep('SRR10009416',rownames(metaData)),]; rownames(sc16.meta)=gsub('SRR10009416_','',rownames(sc16.meta))
+sc17.meta=metaData[grep('SRR10009417',rownames(metaData)),]; rownames(sc17.meta)=gsub('SRR10009417_','',rownames(sc17.meta))
+
+#Add the clusters to the barcodes for each replicate:
+#Add the clusters to the replicate
+sc.14 = setClusters(sc.14, setNames(sc14.meta[rownames(sc14.meta),]$seurat_clusters, rownames(sc14.meta)))
+sc.15 = setClusters(sc.15, setNames(sc15.meta[rownames(sc15.meta),]$seurat_clusters, rownames(sc15.meta)))
+sc.16 = setClusters(sc.16, setNames(sc16.meta[rownames(sc16.meta),]$seurat_clusters, rownames(sc16.meta)))
+sc.17 = setClusters(sc.17, setNames(sc17.meta[rownames(sc17.meta),]$seurat_clusters, rownames(sc17.meta)))
+
+#Set the UMAP coordinates:
+sc.14 = setDR(sc.14, sc14.meta[colnames(sc.14$toc), c("UMAP_1", "UMAP_2")])
+sc.15 = setDR(sc.15, sc15.meta[colnames(sc.15$toc), c("UMAP_1", "UMAP_2")])
+sc.16 = setDR(sc.16, sc16.meta[colnames(sc.16$toc), c("UMAP_1", "UMAP_2")])
+sc.17 = setDR(sc.17, sc17.meta[colnames(sc.17$toc), c("UMAP_1", "UMAP_2")])
 
 #Set "top" marker genes (here they are ordered by adjusted p-value)
 top.markers=SRR10009414.markers[order(SRR10009414.markers$p_val_adj),]

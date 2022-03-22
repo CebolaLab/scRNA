@@ -8,7 +8,7 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 3. **Correct for ambient gene expression** `SoupX` is used to correct for ambient gene expression. 
 4. **QC filtering**: repeat the normalization and clustering with the corrected data. Identify and remove clusters of low-quality cells. Several rounds of pre-processing, clustering and filtering may be required.
 5. **DoubletFinder**: identify and remove droplets with doublets i.e. two (or more) cells.
-6. **Identify final clustering**
+6. **Final clustering**: the cleaned data is processed for a final time and clusters are labelled using known marker genes. (Supervised and/or unsupervised clustering may be carried out). 
 
 ## 2. Background
 

@@ -9,7 +9,6 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 4. [Generate a reference transcriptome](#2-Generate-a-reference-transcriptome)
 5. [Cellranger count](#5-Cellranger-count)
 
-
 ## 1. Pipeline overview
 
 1. **Generate count matrix**: `CellRanger count` is used to generate count matrices with some initial filtering to remove empty droplets. 
@@ -44,11 +43,7 @@ The pipeline for secondary analysis, including references, is discussed below.
 5. **Normalization (within-sample)**. 
 Within-sample normalization aims to normalise counts across cells which can differ due to sequencing depth, RNA content, and efficiency of lysis and reverse transcription [(Saket Choudhary & Rahul Satija, 2022; ](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02584-9)[Grün, Kester and van Oudenaarden. 2014)](http://scholar.google.com/scholar_lookup?&title=Validation%20of%20noise%20models%20for%20single-cell%20transcriptomics&journal=Nat%20Methods&volume=11&issue=6&pages=637-40&publication_year=2014&author=Grün%2CD&author=Kester%2CL&author=van%20Oudenaarden%2CA). Some methods normalize based on the total expression detected per-cell, however this approach is more appropriate for bulk RNA-seq as it assumes that each cell started with the same number of RNA molecules (e.g **Seurat** `NormalizeData` which normalizes by the total expression, multiplied by a scale factor and log-transformed). More recent methods apply downsampling or statistical models. Tools include Linnorm [(Yip et al., 2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7019105/#B42), SCnorm [(Bacher et al., 2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7019105/#B3), scran [(Lun et al., 2016)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7019105/#B25), and more recently, Normalisr [(Wang, 2021)](https://www.nature.com/articles/s41467-021-26682-1), sctransform [(Hafemeister and Satija, 2019)](https://doi.org/10.1186%2Fs13059-019-1874-1), bayNorm [(Tang et al. 2020)](https://www.nature.com/articles/s41467-021-26682-1#ref-CR15), and Sanity [(Breda et al. 2019, *preprint*)](https://www.biorxiv.org/content/10.1101/2019.12.28.889956v1). Other normalization may be considered depending on the specific study design. For example, normalising for biological covariates (such as cell cycle stage) may be useful for trajectory inference. See discussion in [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).
 
-**Variance stabilization**. The aim here is to correct for the relationship between gene expression and variation in expression (a well-known effect which is corrected for in bulk RNA-seq pipelines, for example by DESeq2).
-
-5. **Normalization (between-sample)**. 
-
-6. Imputation?
+Others?? **Variance stabilization**. The aim here is to correct for the relationship between gene expression and variation in expression (a well-known effect which is corrected for in bulk RNA-seq pipelines, for example by DESeq2. Between-sample normalization, imputation
 
 #### Downstream analysis
 
@@ -81,7 +76,7 @@ Seurat anchors?
 
 #### UMAP plots
 
-[(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) UMAP run with the first 20 PCs
+[(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) UMAP run with the first 20 PCs.
 
 #### Differential expression
 
@@ -182,72 +177,86 @@ library(limma)
 library(DoubletFinder)
 ```
 
-Read in the data filtered by CellRanger, here shown for the example sample SRR10009414 from [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3). All the cells will initially be included, in order to carry out normalization and preliminary clustering required for SoupX.
+Read in the data filtered by CellRanger, here shown for the example donor SAMN12614700 from [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3), which includes four technical replicates. All barcodes which passed the cellranger filtering will be included in the initial pre-processing, in order to generate preliminary clusters for input to SoupX. 
 
 ```R
 #Read in data for Seurat
-SAMN12614700.data=Read10X("SAMN12614700/outs/filtered_feature_bc_matrix/")
-
+#Read in technical replicates
 #Initialize the Seurat object with the raw (non-normalized data).
-#No filtering at this stage
-SAMN12614700 <- CreateSeuratObject(counts = SAMN12614700.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
+SRR10009414.data=Read10X("SAMN12614700_male_healthy/SRR10009414_control/outs/filtered_feature_bc_matrix/")
+SRR10009414 <- CreateSeuratObject(counts = SRR10009414.data, project = "SAMN12614700", 
+                                          min.cells = 1, min.features = 1)
+SRR10009415.data=Read10X("SAMN12614700_male_healthy/SRR10009415_control/outs/filtered_feature_bc_matrix/")
+SRR10009415 <- CreateSeuratObject(counts = SRR10009415.data, project = "SAMN12614700", 
+                                          min.cells = 1, min.features = 1)
+SRR10009416.data=Read10X("SAMN12614700_male_healthy/SRR10009416_control/outs/filtered_feature_bc_matrix/")
+SRR10009416 <- CreateSeuratObject(counts = SRR10009416.data, project = "SAMN12614700", 
+                                          min.cells = 1, min.features = 1)
+SRR10009417.data=Read10X("SAMN12614700_male_healthy/SRR10009417_control/outs/filtered_feature_bc_matrix/")
+SRR10009417 <- CreateSeuratObject(counts = SRR10009417.data, project = "SAMN12614700", 
+                                          min.cells = 1, min.features = 1)
 
 #To combine technical replicates:
-#SAMN12614700.data2=Read10X("SAMN12614700_2/outs/filtered_feature_bc_matrix/")
-#SAMN12614700.2 <- CreateSeuratObject(counts = SAMN12614700.data2, project = "SAMN12614700", min.cells = 1, min.features = 1)
-
-#SAMN12614700 <- merge(SAMN12614700, y = SAMN12614700.2, add.cell.ids = c("rep1", "rep1", project = "SAMN12614700")
-#SAMN12614700
+SAMN12614700 <- merge(SRR10009414, y = c(SRR10009415,SRR10009416,SRR10009417),
+                      add.cell.ids = c("SRR10009414", "SRR10009415","SRR10009416","SRR10009417"), 
+                      project = "SAMN12614700")
+SAMN12614700
 ```
 
-The output shows that there is `#24175 features across 1392 samples within 1 assay`, meaning 24,175 expressed genes and 1,392 cells. 
+The output shows that there is `26276 features across 5560 samples within 1 assay `, meaning 26,276 expressed genes and 5,560 cells. 
 
-Next, an initial round of pre-processing will include normalization, clustering and marker gene identification. The normalization will be carried out using [`SCTransform`](https://satijalab.org/seurat/articles/sctransform_vignette.html), which normalizes using a negative binominal in place of a scale factor. SCTransform has been reported to recover improved biological meaning compared to log-normalization based on a scale factor. 
+The following round of pre-processing will include normalization, clustering and marker gene identification. The normalization will be carried out using [`SCTransform`](https://satijalab.org/seurat/articles/sctransform_vignette.html), which normalizes using a negative binominal in place of a scale factor. SCTransform has been reported to recover improved biological meaning compared to log-normalization based on a scale factor. 
 
 ```R
 #SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
-SRR10009414_control.SCT <- SCTransform(SRR10009414_control, conserve.memory=TRUE,return.only.var.genes=TRUE)
+SAMN12614700 <- SCTransform(SAMN12614700, conserve.memory=TRUE,return.only.var.genes=TRUE)
+
 #Carry out dimensionality reduction and clustering:
-SRR10009414_control.SCT <- RunPCA(object = SRR10009414_control.SCT, verbose = FALSE)
-SRR10009414_control.SCT <- RunUMAP(object = SRR10009414_control.SCT, dims = 1:20, verbose = FALSE)
-SRR10009414_control.SCT <- FindNeighbors(object = SRR10009414_control.SCT, dims = 1:20, verbose = FALSE)
-SRR10009414_control.SCT <- FindClusters(object = SRR10009414_control.SCT, verbose = FALSE)
+SAMN12614700 <- RunPCA(object = SAMN12614700, verbose = FALSE)
+SAMN12614700 <- RunUMAP(object = SAMN12614700, dims = 1:20, verbose = FALSE)
+SAMN12614700 <- FindNeighbors(object = SAMN12614700, dims = 1:20, verbose = FALSE)
+SAMN12614700 <- FindClusters(object = SAMN12614700, verbose = FALSE)
 ```
 
 Identify cluster marker genes:
 ```R
-SRR10009414.markers <- FindAllMarkers(SRR10009414_control.SCT, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
-markers=SRR10009414.markers %>%
+#Identify marker genes
+SAMN12614700.markers <- FindAllMarkers(SAMN12614700, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+#Subset the top 5 marker genes per cluster
+markers=SAMN12614700.markers %>%
     group_by(cluster) %>%
     slice_max(n = 5, order_by = avg_log2FC)
 ```
+
 
 These initial clusters can be visualised in a UMAP plot. Note that these clusters form the temporary input to the next stage of analysis (`SoupX`) and are *not* the final clusters.
 
 ```R
 #UMAP plot
-DimPlot(object = SRR10009414_control.SCT, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform")
+DimPlot(object = SAMN12614700, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("preliminary clustering - sctransform")
 ```
 
 ![UMAP plot 1](https://github.com/CebolaLab/scRNA/blob/main/Figures/UMAP1.png)
 
-We will add the UMAP coordinates to the metaData so they can be read by SoupX:
+Add the UMAP coordinates to the metaData for compatability with SoupX:
+
 ```R
 #Add the UMAP coordinates to the metaData for later compatability with SoupX
-umapCoord <- as.data.frame(Embeddings(object = SRR10009414_control.SCT[["umap"]]))
+umapCoord <- as.data.frame(Embeddings(object = SAMN12614700[["umap"]]))
 
 #You can then add the PC columns to the meta.data as you please (cbind, sapply, paste(..,collapse=),...)
-metaData <- SRR10009414_control.SCT@meta.data
+#For example, if you only need to add the PCs components, without modifying them or doing other processing, you can do a simple merge
+metaData <- SAMN12614700@meta.data
 
 metaData$UMI_id <- rownames(metaData)
 umapCoord$UMI_id <- rownames(umapCoord)
 
 metaData <- merge.data.frame(metaData,umapCoord,by = "UMI_id")
 metaData$UMI_id <- NULL
-rownames(metaData) = rownames(SRR10009414_control.SCT@meta.data)
+rownames(metaData) = rownames(SAMN12614700@meta.data)
 
-#Add the new dataframe to the object as metaData
-SRR10009414_control.SCT@meta.data <- metaData
+SAMN12614700@meta.data <- metaData
+head(SAMN12614700@meta.data)
 ```
 
 ### SoupX

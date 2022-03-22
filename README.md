@@ -3,8 +3,8 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 
 ## Table of contents
 
-1. [1. Pipeline overview](#1._Pipeline_overview)
-
+[1. Pipeline overview](#1._Pipeline_overview)
+[2. Background](#2._Background)
 
 ## 1. Pipeline overview
 

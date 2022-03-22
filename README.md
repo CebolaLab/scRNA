@@ -320,10 +320,9 @@ You can highlight cells within the UMAP plot where a gene is expressed *at all* 
 
 ```R
 #Plot the expression of an example gene
-dd$CO1 = sc$toc["MT-CO1", ] #FCN1 is kupffer, CFTR is Cholangiocyte
+dd$CO1 = sc.14$toc["MT-CO1", ] 
 ggplot(dd, aes(UMAP_1, UMAP_2)) + geom_point(aes(colour = CO1 > 0))
-#CLEC4G PECAM1 LYVE1
-plotMarkerMap(sc, "MT-CO1",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
+plotMarkerMap(sc.14, "MT-CO1",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
 ```
 
 Cells where MT-CO1 is expressed at >1 count:  
@@ -359,13 +358,12 @@ SAMN12614700.noSoup <- FindNeighbors(object = SAMN12614700.noSoup, dims = 1:20, 
 SAMN12614700.noSoup <- FindClusters(object = SAMN12614700.noSoup, verbose = FALSE)
 plot1 <- DimPlot(object = SAMN12614700.noSoup, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform")
 ```
+Compare the original count matrix with the current:
 
-We now have `18033 features across 1279 samples within 1 assay`.
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/comparison1.png" height="400">
+
 
 ```R
-#SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
-SRR10009414_control.noSoup.SCT <- SCTransform(SRR10009414_control.noSoup, conserve.memory=TRUE,return.only.var.genes=TRUE)
-
 # The [[ operator can add columns to object metadata. This is a great place to stash QC stats
 SRR10009414_control.noSoup.SCT[["percent.mt"]] <- PercentageFeatureSet(SRR10009414_control.noSoup.SCT, pattern = "^MT-")
 # Visualize QC metrics as a violin plot

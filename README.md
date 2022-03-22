@@ -17,15 +17,13 @@ The pipeline for secondary analysis, including references, is discussed below.
 
 1. **Empty droplets and ambient gene expression**. A proportion of the barcodes in the count matrix will correspond to empty droplets. A simple method to identify such droplets may use a minimum threshold of counts. However, this risks removing cells with low levels of gene expression, such as quiescent cells. More sophisticated methods identify empty droplets through *ambient gene expression*, which refers to the background expression detected in all droplets from contaminating cell-free RNA. Modelling ambient gene expression in empty droplets can also allow other droplets to be corrected for contaminating counts, thus avoiding problems in downstream analysis and clustering. Several sophisticated methods exist with which to remove empty droplets and correct the remaining data for ambient or 'background' gene expression. These include SoupX [(Young and Behjati, 2020)](https://doi.org/10.1093/gigascience/giaa151), EmptyDrops [(Lun et al. 2019)](https://doi.org/10.1186%2Fs13059-019-1662-y) and DEIM [(Alvarez et al. 2020](https://www.nature.com/articles/s41598-020-67513-5) (note DEIM was designed for single-nuclei data, although shown to work with scRNA as well). This pipeline will use **SoupX**. 
 
-2. **Outliers**. Common metrics used to filter uninformative GEMs such as damaged cells include the number of read counts and genes, as well as the % of mitochondrial DNA expression. For example, very high mtDNA expression can indicate cells where the cytoplasmic RNA leaked from the cell membrane, while gene expressed in little to no cells (gene-level filtering), will remove ininformative data. Earlier methods set hard cut-off thresholds, however this may remove meaningful biology, such as quiesent cells with low gene counts or highly active cells with a high level of mitochondria gene expression. 
+2. **Low-quality and uninformative barcodes**. GEMs containing damaged cells can be identified using metrics such as a high % of mitochondrial gene expression, or low read counts and gene features. For example, very high mtDNA expression can indicate cells where the cytoplasmic RNA leaked from the cell membrane. Hard cut-offs may be used to filter the data, however this may remove meaningful biology, such as quiesent cells with low gene counts or highly active cells with a high level of mitochondria gene expression. Prior knowledge of the expected cell types may inform the use of thresholds. An improved approach may be to first carry out clustering and identify clusters of low-quality barcodes for removal. 
 
-An improved approach may be to identify clusters of cells with 
 
-If setting cut-offs It is advisable to explore your data to set 
-
-Any threshold for filtering genes should be informed by your experimental design, including the number of cells in the dataset and the number of cells in the smallest cluster of interest [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).
-
-Filtering typically remove barcodes based on three typical QC measures: (1) the number of read counts per barcode, (2) the number of genes detected per barcode, and (3) the proportion of mitochondrial DNA.
+Filtering typically remove barcodes based on three typical QC measures:  
+> the number of read counts per barcode  
+> the number of genes detected per barcode  
+> the proportion of mitochondrial DNA
 
 The thresholds will be specific to the distribution of reads in your data, with the aim of removing barcodes with outliers. For example, [Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) retained cells with gene counts \>200 and \<2,500 and a mitochondrial content \<10%. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) retained cells with >30000 UMIs, 200-5000 genes, and less than 50% mitochondrial expression percentage. [Hardwick et al. (2022)](https://www.nature.com/articles/s41587-022-01231-3) excluded nuclei with unique gene counts >7,500 or <200 or >4% mitochondrial gene expression (note this is single-**nuclei** RNA-seq). 
 
@@ -408,6 +406,7 @@ To check how many cells are in each cluster:
 table(Idents(object = SRR10009414_control.noSoup.SCT))
 ```
 
+Any threshold for filtering genes should be informed by your experimental design, including the number of cells in the dataset and the number of cells in the smallest cluster of interest [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).
 * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 `DropletUtils`

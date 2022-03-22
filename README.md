@@ -183,18 +183,18 @@ Read in the data filtered by CellRanger, here shown for the example donor SAMN12
 #Read in data for Seurat
 #Read in technical replicates
 #Initialize the Seurat object with the raw (non-normalized data).
+#Technical replicate 1
 SRR10009414.data=Read10X("SAMN12614700_male_healthy/SRR10009414_control/outs/filtered_feature_bc_matrix/")
-SRR10009414 <- CreateSeuratObject(counts = SRR10009414.data, project = "SAMN12614700", 
-                                          min.cells = 1, min.features = 1)
+SRR10009414 <- CreateSeuratObject(counts = SRR10009414.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
+#Technical replicate 2
 SRR10009415.data=Read10X("SAMN12614700_male_healthy/SRR10009415_control/outs/filtered_feature_bc_matrix/")
-SRR10009415 <- CreateSeuratObject(counts = SRR10009415.data, project = "SAMN12614700", 
-                                          min.cells = 1, min.features = 1)
+SRR10009415 <- CreateSeuratObject(counts = SRR10009415.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
+#Technical replicate 3
 SRR10009416.data=Read10X("SAMN12614700_male_healthy/SRR10009416_control/outs/filtered_feature_bc_matrix/")
-SRR10009416 <- CreateSeuratObject(counts = SRR10009416.data, project = "SAMN12614700", 
-                                          min.cells = 1, min.features = 1)
+SRR10009416 <- CreateSeuratObject(counts = SRR10009416.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
+#Technical replicate 4
 SRR10009417.data=Read10X("SAMN12614700_male_healthy/SRR10009417_control/outs/filtered_feature_bc_matrix/")
-SRR10009417 <- CreateSeuratObject(counts = SRR10009417.data, project = "SAMN12614700", 
-                                          min.cells = 1, min.features = 1)
+SRR10009417 <- CreateSeuratObject(counts = SRR10009417.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
 
 #To combine technical replicates:
 SAMN12614700 <- merge(SRR10009414, y = c(SRR10009415,SRR10009416,SRR10009417),
@@ -292,7 +292,9 @@ sc.14 = setDR(sc.14, sc14.meta[colnames(sc.14$toc), c("UMAP_1", "UMAP_2")])
 sc.15 = setDR(sc.15, sc15.meta[colnames(sc.15$toc), c("UMAP_1", "UMAP_2")])
 sc.16 = setDR(sc.16, sc16.meta[colnames(sc.16$toc), c("UMAP_1", "UMAP_2")])
 sc.17 = setDR(sc.17, sc17.meta[colnames(sc.17$toc), c("UMAP_1", "UMAP_2")])
+```
 
+```R
 #Set "top" marker genes (here they are ordered by adjusted p-value)
 top.markers=SRR10009414.markers[order(SRR10009414.markers$p_val_adj),]
 sc = autoEstCont(sc,topMarkers = top.markers)

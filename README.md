@@ -3,8 +3,9 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 
 ## Table of contents
 
-[1. Pipeline overview](#1-Pipeline-overview)  
-[2. Background](#2-Background)
+1. [Pipeline overview](#1-Pipeline-overview)  
+2. [Background](#2-Background)
+3. [Workspace setup](#3-Workspace-setup)
 
 ## 1. Pipeline overview
 
@@ -83,7 +84,7 @@ Seurat anchors?
 
 **Seurat**: `FindAllMarkers`
 
-## 2. Installations
+## 3. Workspace setup
 
 This pipeline will process data from Chromium Single Cell A Chip Kit (10X Genomics) using Seurat v4 and Cell Ranger v6.1.
 

@@ -205,7 +205,7 @@ SAMN12614700 <- merge(SRR10009414, y = c(SRR10009415,SRR10009416,SRR10009417),
 SAMN12614700
 ```
 
-The output shows that there is `26276 features across 5560 samples within 1 assay `, meaning 26,276 expressed genes and 5,560 cells. 
+The output shows that there is `26276 features across 5560 samples within 1 assay`, meaning 26,276 expressed genes and 5,560 cells. 
 
 The following round of pre-processing will include normalization, clustering and marker gene identification. The normalization will be carried out using [`SCTransform`](https://satijalab.org/seurat/articles/sctransform_vignette.html), which normalizes using a negative binominal in place of a scale factor. SCTransform has been reported to recover improved biological meaning compared to log-normalization based on a scale factor. 
 
@@ -229,7 +229,6 @@ markers=SAMN12614700.markers %>%
     group_by(cluster) %>%
     slice_max(n = 5, order_by = avg_log2FC)
 ```
-
 
 These initial clusters can be visualised in a UMAP plot. Note that these clusters form the temporary input to the next stage of analysis (`SoupX`) and are *not* the final clusters.
 
@@ -297,20 +296,22 @@ sc.17 = setDR(sc.17, sc17.meta[colnames(sc.17$toc), c("UMAP_1", "UMAP_2")])
 ```
 
 ```R
-#Set "top" marker genes (here they are ordered by adjusted p-value)
-top.markers=SRR10009414.markers[order(SRR10009414.markers$p_val_adj),]
-sc = autoEstCont(sc,topMarkers = top.markers)
-# Estimate rho
-sc = autoEstCont(sc)
+#Estimate the contaminating fraction
+sc.14 = autoEstCont(sc.14) 
 # Clean the data
-out = adjustCounts(sc)
+out14 = adjustCounts(sc.14)
+
+#Repeat for technical replicates 2-4:
+sc.15 = autoEstCont(sc.15); out15 = adjustCounts(sc.15) 
+sc.16 = autoEstCont(sc.16); out16 = adjustCounts(sc.16)
+sc.17 = autoEstCont(sc.17); out17 = adjustCounts(sc.17)
 ```
 
 The output data includes the genes whose contaminating reads make a significant contribution to the "soup", i.e. contribute the *ambient gene expression*. These will most likely include several mitochondrial genes.
 
 ```R
-head(sc$soupProfile[order(sc$soupProfile$est, decreasing = TRUE), ], n = 20)
-plotMarkerDistribution(sc)
+head(sc.14$soupProfile[order(sc.14$soupProfile$est, decreasing = TRUE), ], n = 20)
+plotMarkerDistribution(sc.14)
 ```
 
 You can highlight cells within the UMAP plot where a gene is expressed *at all* vs expressed above the background. For example for the mitochondrial gene `MT-CO1`. 
@@ -329,19 +330,32 @@ Cells where MT-CO1 is expressed at >1 count:
 Cells where MT-CO1 has significant expression, above that of the background "soup" contamination in all cells:  
 ![MT-CO1_significant](https://github.com/CebolaLab/scRNA/blob/main/Figures/MT-CO1.2.png)
 
-Correct the count matrix for the ambient gene expresison and create a Seurat data object.
+Create a Seurat data object from the four corrected replicates. This step will involve some initial filtering, to excluded genes detected in less than 3 cells and to exclude cells with less than 200 detected genes. 
+
+### QC and filtering 
 
 ```R 
-out = adjustCounts(sc)
+srat.14 <- CreateSeuratObject(counts = out.14, project = "SAMN12614700",  min.cells = 3, min.features = 200)
+srat.15 <- CreateSeuratObject(counts = out.15, project = "SAMN12614700",  min.cells = 3, min.features = 200)
+srat.16 <- CreateSeuratObject(counts = out.16, project = "SAMN12614700",  min.cells = 3, min.features = 200)
+srat.17 <- CreateSeuratObject(counts = out.17, project = "SAMN12614700",  min.cells = 3, min.features = 200)
+
+#Merge technical replicates
+SAMN12614700.noSoup <- merge(srat.14, y = c(srat.15,srat.16,srat.17),
+                      add.cell.ids = c("SRR10009414", "SRR10009415","SRR10009416","SRR10009417"), 
+                      project = "SAMN12614700")
 ```
 
-## Quality-control and filtering
-
-Using the new, background-corrected count matrix (`srat`), we will now explore the QC of the data and filter out low-quality cells and/or clusters. First, the initial pre-processing will be rerun:
+Using the new, background-corrected count matrix, we will now explore the QC of the data and filter out low-quality cells and/or clusters. First, the initial pre-processing will be rerun:
 
 ```R
-SRR10009414_control.noSoup <- CreateSeuratObject(counts = out, project = "SRR10009414_control", min.cells = 3, min.features = 100)
-SRR10009414_control.noSoup
+#SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
+SAMN12614700.noSoup <- SCTransform(SAMN12614700.noSoup, conserve.memory=TRUE,return.only.var.genes=TRUE)
+SAMN12614700.noSoup <- RunPCA(object = SAMN12614700.noSoup, verbose = FALSE)
+SAMN12614700.noSoup <- RunUMAP(object = SAMN12614700.noSoup, dims = 1:20, verbose = FALSE)
+SAMN12614700.noSoup <- FindNeighbors(object = SAMN12614700.noSoup, dims = 1:20, verbose = FALSE)
+SAMN12614700.noSoup <- FindClusters(object = SAMN12614700.noSoup, verbose = FALSE)
+plot1 <- DimPlot(object = SAMN12614700.noSoup, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform")
 ```
 
 We now have `18033 features across 1279 samples within 1 assay`.

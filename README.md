@@ -259,7 +259,7 @@ SAMN12614700@meta.data <- metaData
 head(SAMN12614700@meta.data)
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/metaData1.png" width="400">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/metaData1.png" width="600">
 
 ### SoupX
 

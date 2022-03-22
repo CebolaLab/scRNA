@@ -7,13 +7,13 @@ This pipeline has been developed by carefully reviewing current tools and best p
 
 #### Alignment, demultiplexing and quantification
 
-There are several alignment algorithms to choose from, including CellRanger, STARsolo, Alevin, Alevin-fry and Kallisto; these are compared in [Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741). This pipeline will use **CellRanger**, which is the analysis toolbox from 10X Genomics. [Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) suggest STARsolo as an avisable alternative if memory requirement is an issue.
-
-CellRanger includes the demultiplexing of reads based on unique barcodes, which should correspond to unique cells following secondary filtering and QC. 
+There are several alignment algorithms to choose from, including CellRanger, STARsolo, Alevin, Alevin-fry and Kallisto; these are compared in [Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741). This pipeline will use the 10X Genomics toolbox, **CellRanger**. If memory requirement is an issue, [Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) suggest STARsolo as an alternative.
 
 #### Secondary analysis
 
-The above tools generate a 'count matrix', which contains counts of reads for each gene, per-cell. The count matrices then undergo quality checks and filtering. The aim is to remove instances of droplets or "GEMs" (Gel Beads in EMulsion) with more or less than one cell, damaged cells, or other uninformative data. 
+CellRanger includes the demultiplexing of reads from individual droplets, or 'GEMs' (Gel Beads in EMulsion), based on unique barcodes. These should /*in theory* correspond to unique cells. However, many droplets will be empty, or contain damaged or low quality cells. These will later be removed. 
+
+The output from the previous step is a count matrix, which contains counts of reads for each gene, per-cell. The count matrix then undergoes quality checks and filtering. The aim is to remove instances of droplets with more or less than one cell, damaged cells, or other uninformative data. 
 
 The pipeline for secondary analysis, including references, is discussed below.
 

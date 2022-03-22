@@ -180,8 +180,7 @@ library(DoubletFinder)
 Read in the data filtered by CellRanger, here shown for the example donor SAMN12614700 from [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3), which includes four technical replicates. All barcodes which passed the cellranger filtering will be included in the initial pre-processing, in order to generate preliminary clusters for input to SoupX. 
 
 ```R
-#Read in data for Seurat
-#Read in technical replicates
+#Read in data for four technical replicates
 #Initialize the Seurat object with the raw (non-normalized data).
 #Technical replicate 1
 SRR10009414.data=Read10X("SAMN12614700_male_healthy/SRR10009414_control/outs/filtered_feature_bc_matrix/")

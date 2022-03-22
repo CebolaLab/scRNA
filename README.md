@@ -236,7 +236,7 @@ These initial clusters can be visualised in a UMAP plot. Note that these cluster
 DimPlot(object = SAMN12614700, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("preliminary clustering - sctransform")
 ```
 
-![UMAP plot 1](https://github.com/CebolaLab/scRNA/blob/main/Figures/UMAP1.png)
+![UMAP1](https://github.com/CebolaLab/scRNA/blob/main/Figures/UMAP2.png | width=100)
 
 Add the UMAP coordinates to the metaData for compatability with SoupX:
 

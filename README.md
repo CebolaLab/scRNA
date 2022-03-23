@@ -478,48 +478,6 @@ Several previous scRNA-seq analysis of liver methods include:
 - [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) "The expression of different combinations of genes was used to define scores and signatures using the Seurat PercentageFeatureSet function".
 - [Aizarani et al. 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/). cells from select clusters were reanalyzed with [RaceID3](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R4) (see paper for parameters). [StemID](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R24) was run on resulting, filtered and feature-selected expression matrix, with target clusters "inferred by FateID using ASGR1 plus ALB and CXCL8 plus MMP7 as markers for hepatocyte and cholangiocyte lineage target clusters. Using the KRT19 and CFTR as mature cholangiocyte markers yields highly similar results."
 
-```R
-#Recommended pipeline by the author of DoubletFinder
-## Pre-process Seurat object (standard) --------------------------------------------------------------------------------------
-seu_kidney <- CreateSeuratObject(kidney.data)
-seu_kidney <- NormalizeData(seu_kidney)
-seu_kidney <- FindVariableFeatures(seu_kidney, selection.method = "vst", nfeatures = 2000)
-seu_kidney <- ScaleData(seu_kidney)
-seu_kidney <- RunPCA(seu_kidney)
-seu_kidney <- RunUMAP(seu_kidney, dims = 1:10)
-
-## Pre-process Seurat object (sctransform) -----------------------------------------------------------------------------------
-seu_kidney <- CreateSeuratObject(kidney.data)
-seu_kidney <- SCTransform(seu_kidney)
-seu_kidney <- RunPCA(seu_kidney)
-seu_kidney <- RunUMAP(seu_kidney, dims = 1:10)
-
-## pK Identification (no ground-truth) ---------------------------------------------------------------------------------------
-sweep.res.list_kidney <- paramSweep_v3(seu_kidney, PCs = 1:10, sct = FALSE)
-sweep.stats_kidney <- summarizeSweep(sweep.res.list_kidney, GT = FALSE)
-bcmvn_kidney <- find.pK(sweep.stats_kidney)
-
-## pK Identification (ground-truth) ------------------------------------------------------------------------------------------
-sweep.res.list_kidney <- paramSweep_v3(seu_kidney, PCs = 1:10, sct = FALSE)
-gt.calls <- seu_kidney@meta.data[rownames(sweep.res.list_kidney[[1]]), "GT"].   ## GT is a vector containing "Singlet" and "Doublet" calls recorded using sample multiplexing classification and/or in silico geneotyping results 
-sweep.stats_kidney <- summarizeSweep(sweep.res.list_kidney, GT = TRUE, GT.calls = gt.calls)
-bcmvn_kidney <- find.pK(sweep.stats_kidney)
-
-## Homotypic Doublet Proportion Estimate -------------------------------------------------------------------------------------
-homotypic.prop <- modelHomotypic(annotations)           ## ex: annotations <- seu_kidney@meta.data$ClusteringResults
-nExp_poi <- round(0.075*nrow(seu_kidney@meta.data))  ## Assuming 7.5% doublet formation rate - tailor for your dataset
-nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
-
-## Run DoubletFinder with varying classification stringencies ----------------------------------------------------------------
-seu_kidney <- doubletFinder_v3(seu_kidney, PCs = 1:10, pN = 0.25, pK = 0.09, nExp = nExp_poi, reuse.pANN = FALSE, sct = FALSE)
-seu_kidney <- doubletFinder_v3(seu_kidney, PCs = 1:10, pN = 0.25, pK = 0.09, nExp = nExp_poi.adj, reuse.pANN = "pANN_0.25_0.09_913", sct = FALSE)
-```
-
-- [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) filter cells using the R packages DropletUtils and then use `Seurat` for downstream analysis, retaining cells with gene counts \>200 and \<2,500 and a mitochondrial content \<10%.
-- [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) "removed doublet cells using “DoubletFinder”. Then we use the function “decontX” of “celda” to correct the probable cross containment. Then the corrected expression matrix was processed by “Seurat V3.14”. For the quality control, cells with 0~30000 UMIs, 200~5000 genes, and less than 50% mitochondrial expression percentage were filtered out for the next analysis."
-
-For single-nuclei RNA, [Hardwick et al. (2022)](https://www.nature.com/articles/s41587-022-01231-3) excluded nuclei with unique gene counts >7,500 or <200 or >4% mitochondrial gene expression. UMI numbers and mitochondrial gene expression % were regressed from each nucleus and the matrix was log-normalised and scaled to 10,000 reads per cell. Performed both tSNE and UMAP non-lnear reduction techniques... cell types assigned by canonical marker genes for each cluster... cell type annotation confirmed by aligning to <other data>. (Hardwick et al. 2022, Nature Biotechnology).
-
 # References
 
 - [Leucken and Theis (2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746): A 2019 effort to compile current best practises in scRNA-seq. This paper is very useful for "newbies" and gives an excellent overview of the essential steps of scRNA-seq analysis (note that some specific tools mentioned are superceeded by more recent published tools).
@@ -528,6 +486,7 @@ For single-nuclei RNA, [Hardwick et al. (2022)](https://www.nature.com/articles/
 e.g. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) use `DoubletFinder` and then `decontX` of `celda` to correct for "cross containment".
 3. **CellRanger**: cellranger also provides it's own tools for secondary analysis, the "`cellranger reanalyze` command reruns secondary analysis performed on the feature-barcode matrix (dimensionality reduction, clustering and visualization) using different parameter settings."
 
+# Extra notes
 
 [`DropletUtils`](https://bioconductor.org/packages/release/bioc/vignettes/DropletUtils/inst/doc/DropletUtils.html) is an R package for filtering droplet-based scRNA-seq data. (See example use in [Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741)). This package can be used to read in the count matrix to R, filter empty droplets and visualise QC plots for the distribution of counts across barcodes, as well as downsample the count matrix or raw reads etc.
 
@@ -539,3 +498,10 @@ e.g. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?lo
 Note...sctransform was used by the Satija lab in their 2022 [publication](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02584-9#Sec8)
 
 "In particular, two recent studies proposed to use generalized linear models (GLMs), where cellular sequencing depth was included as a covariate, as part of scRNA-seq preprocessing workflows. Our sctransform [9] approach utilizes the Pearson residuals from negative binomial regression as input to standard dimensional reduction techniques, while GLM-PCA [10] focuses on a generalized version of principal component analysis (PCA) for data with Poisson-distributed errors. More broadly, multiple techniques aim to learn a latent state that captures biologically relevant cellular heterogeneity using either matrix factorization or neural networks [11–13], alongside a defined error model that describes the variation that is not captured by the latent space.
+
+
+
+- [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) filter cells using the R packages DropletUtils and then use `Seurat` for downstream analysis, retaining cells with gene counts \>200 and \<2,500 and a mitochondrial content \<10%.
+- [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) "removed doublet cells using “DoubletFinder”. Then we use the function “decontX” of “celda” to correct the probable cross containment. Then the corrected expression matrix was processed by “Seurat V3.14”. For the quality control, cells with 0~30000 UMIs, 200~5000 genes, and less than 50% mitochondrial expression percentage were filtered out for the next analysis."
+
+For single-nuclei RNA, [Hardwick et al. (2022)](https://www.nature.com/articles/s41587-022-01231-3) excluded nuclei with unique gene counts >7,500 or <200 or >4% mitochondrial gene expression. UMI numbers and mitochondrial gene expression % were regressed from each nucleus and the matrix was log-normalised and scaled to 10,000 reads per cell. Performed both tSNE and UMAP non-lnear reduction techniques... cell types assigned by canonical marker genes for each cluster... cell type annotation confirmed by aligning to <other data>. (Hardwick et al. 2022, Nature Biotechnology).

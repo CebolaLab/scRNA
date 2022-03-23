@@ -116,7 +116,7 @@ cellranger mkref --ref-version="$version" --genome="$genome" --fasta="$fasta_in"
 
 ## 5. Cellranger count
 
-To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. `SRR10009414_S1_L00X_R1_001.fastq.gz` (and the corresponding `I1` and `R2`). The below command should be run, where `<ID>` is the sample ID at the start of the filename (e.g. SRR10009414) and the `<PATH>` should direct to the reference directory created by the previous command. **Technical replicates can be combined here, or in the next stage in R.**
+To run `cellranger count`, make sure your files are in the `bcl2fastq` naming convention e.g. `SRR10009414_S1_L00X_R1_001.fastq.gz` (and the corresponding `I1` and `R2`). The below command should be run, where `<ID>` is the sample ID at the start of the filename (e.g. SRR10009414) and the `<PATH>` should direct to the reference directory created by the previous command. **Technical replicates should be combined here**.
 
 ```bash
 #Run cellranger count with the sampleID and cellranger reference directory
@@ -167,27 +167,20 @@ Read in the data filtered by CellRanger, here shown for the example donor SAMN12
 ```R
 #Read in data for four technical replicates
 #Initialize the Seurat object with the raw (non-normalized data).
+SAMN12614700.data=Read10X("SAMN12614700_male_healthy/SAMN12614700/outs/filtered_feature_bc_matrix/")
+SAMN12614700 <- CreateSeuratObject(counts = SAMN12614700.data, project = "SAMN12614700", 
+                                          min.cells = 1, min.features = 1)
+
+#If technical replicates are being merged at this stage instead, the following code can be used:
 #Technical replicate 1
-SRR10009414.data=Read10X("SAMN12614700_male_healthy/SRR10009414_control/outs/filtered_feature_bc_matrix/")
-SRR10009414 <- CreateSeuratObject(counts = SRR10009414.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
-
+#rep1.data=Read10X("SAMN12614700_male_healthy/SRR10009414_control/outs/filtered_feature_bc_matrix/")
+#rep1 <- CreateSeuratObject(counts = SRR10009414.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
 #Technical replicate 2
-SRR10009415.data=Read10X("SAMN12614700_male_healthy/SRR10009415_control/outs/filtered_feature_bc_matrix/")
-SRR10009415 <- CreateSeuratObject(counts = SRR10009415.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
-
-#Technical replicate 3
-SRR10009416.data=Read10X("SAMN12614700_male_healthy/SRR10009416_control/outs/filtered_feature_bc_matrix/")
-SRR10009416 <- CreateSeuratObject(counts = SRR10009416.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
-
-#Technical replicate 4
-SRR10009417.data=Read10X("SAMN12614700_male_healthy/SRR10009417_control/outs/filtered_feature_bc_matrix/")
-SRR10009417 <- CreateSeuratObject(counts = SRR10009417.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
-
+#rep2.data=Read10X("SAMN12614700_male_healthy/SRR10009415_control/outs/filtered_feature_bc_matrix/")
+#rep2 <- CreateSeuratObject(counts = SRR10009415.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
 #To combine technical replicates:
-SAMN12614700 <- merge(SRR10009414, y = c(SRR10009415,SRR10009416,SRR10009417),
-                      add.cell.ids = c("SRR10009414", "SRR10009415","SRR10009416","SRR10009417"), 
-                      project = "SAMN12614700")
-SAMN12614700
+#merged <- merge(rep1, y = rep2,add.cell.ids = c("rep1", "rep2"),project = "SAMN12614700")
+
 ```
 
 The output shows that there is `26276 features across 5560 samples within 1 assay`, meaning 26,276 expressed genes and 5,560 cells. 
@@ -254,49 +247,25 @@ The UMAP coordinates for each barcode are in the UMAP_1 and UMAP_2 columns:
 
 ```R
 #Read in data for SoupX
-sc.14 = load10X("SAMN12614700_male_healthy/SRR10009414_control/outs/")
-sc.15 = load10X("SAMN12614700_male_healthy/SRR10009415_control/outs/")
-sc.16 = load10X("SAMN12614700_male_healthy/SRR10009416_control/outs/")
-sc.17 = load10X("SAMN12614700_male_healthy/SRR10009417_control/outs/")
+sc = load10X("SAMN12614700_male_healthy/SAMN12614700/outs/")
 
-#Extract the metaData for each technical replicate 
-#Note - the metaData following merging from the initial pre-processing has the sampleID appended before the barcode
-sc14.meta=metaData[grep('SRR10009414',rownames(metaData)),]; rownames(sc14.meta)=gsub('SRR10009414_','',rownames(sc14.meta))
-sc15.meta=metaData[grep('SRR10009415',rownames(metaData)),]; rownames(sc15.meta)=gsub('SRR10009415_','',rownames(sc15.meta))
-sc16.meta=metaData[grep('SRR10009416',rownames(metaData)),]; rownames(sc16.meta)=gsub('SRR10009416_','',rownames(sc16.meta))
-sc17.meta=metaData[grep('SRR10009417',rownames(metaData)),]; rownames(sc17.meta)=gsub('SRR10009417_','',rownames(sc17.meta))
-
-#Add the clusters to the barcodes for each replicate:
-#Add the clusters to the replicate
-sc.14 = setClusters(sc.14, setNames(sc14.meta[rownames(sc14.meta),]$seurat_clusters, rownames(sc14.meta)))
-sc.15 = setClusters(sc.15, setNames(sc15.meta[rownames(sc15.meta),]$seurat_clusters, rownames(sc15.meta)))
-sc.16 = setClusters(sc.16, setNames(sc16.meta[rownames(sc16.meta),]$seurat_clusters, rownames(sc16.meta)))
-sc.17 = setClusters(sc.17, setNames(sc17.meta[rownames(sc17.meta),]$seurat_clusters, rownames(sc17.meta)))
+#Add the barcode clusters to the soupChannel object
+sc = setClusters(sc, setNames(metaData[colnames(sc$toc),]$seurat_clusters, colnames(sc$toc)))
 
 #Set the UMAP coordinates:
-sc.14 = setDR(sc.14, sc14.meta[colnames(sc.14$toc), c("UMAP_1", "UMAP_2")])
-sc.15 = setDR(sc.15, sc15.meta[colnames(sc.15$toc), c("UMAP_1", "UMAP_2")])
-sc.16 = setDR(sc.16, sc16.meta[colnames(sc.16$toc), c("UMAP_1", "UMAP_2")])
-sc.17 = setDR(sc.17, sc17.meta[colnames(sc.17$toc), c("UMAP_1", "UMAP_2")])
-```
+sc = setDR(sc, metaData[colnames(sc$toc), c("UMAP_1", "UMAP_2")])
 
-```R
 #Estimate the contaminating fraction
-sc.14 = autoEstCont(sc.14) 
+sc.14 = autoEstCont(sc) 
 # Clean the data
-out14 = adjustCounts(sc.14)
-
-#Repeat for technical replicates 2-4:
-sc.15 = autoEstCont(sc.15); out15 = adjustCounts(sc.15) 
-sc.16 = autoEstCont(sc.16); out16 = adjustCounts(sc.16)
-sc.17 = autoEstCont(sc.17); out17 = adjustCounts(sc.17)
+out14 = adjustCounts(sc)
 ```
 
 The output data includes the genes whose contaminating reads make a significant contribution to the "soup", i.e. contribute the *ambient gene expression*. These will most likely include several mitochondrial genes.
 
 ```R
-head(sc.14$soupProfile[order(sc.14$soupProfile$est, decreasing = TRUE), ], n = 20)
-plotMarkerDistribution(sc.14)
+head(sc$soupProfile[order(sc$soupProfile$est, decreasing = TRUE), ], n = 20)
+plotMarkerDistribution(sc)
 ```
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/soup.png" height="400">
@@ -305,9 +274,9 @@ You can highlight cells within the UMAP plot where a gene is expressed *at all* 
 
 ```R
 #Plot the expression of an example gene
-dd$CO1 = sc.14$toc["MT-CO1", ] 
+dd$CO1 = sc$toc["MT-CO1", ] 
 ggplot(dd, aes(UMAP_1, UMAP_2)) + geom_point(aes(colour = CO1 > 0))
-plotMarkerMap(sc.14, "MT-CO1",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
+plotMarkerMap(sc, "MT-CO1",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
 ```
 
 Cells where MT-CO1 is expressed at >1 count:  
@@ -321,17 +290,10 @@ Create a Seurat data object from the four corrected replicates. This step will i
 ### QC and filtering 
 
 ```R 
-srat.14 <- CreateSeuratObject(counts = out.14, project = "SAMN12614700",  min.cells = 3, min.features = 200)
-srat.15 <- CreateSeuratObject(counts = out.15, project = "SAMN12614700",  min.cells = 3, min.features = 200)
-srat.16 <- CreateSeuratObject(counts = out.16, project = "SAMN12614700",  min.cells = 3, min.features = 200)
-srat.17 <- CreateSeuratObject(counts = out.17, project = "SAMN12614700",  min.cells = 3, min.features = 200)
-
-#Merge technical replicates
-SAMN12614700.noSoup <- merge(srat.14, y = c(srat.15,srat.16,srat.17),
-                      add.cell.ids = c("SRR10009414", "SRR10009415","SRR10009416","SRR10009417"), 
-                      project = "SAMN12614700")
+SAMN12614700.noSoup <- CreateSeuratObject(counts = out, project = "SAMN12614700",  min.cells = 3, min.features = 200)
 
 #Remove droplets with %mtDNA>50
+SAMN12614700.noSoup[["percent.mt"]] <- PercentageFeatureSet(SAMN12614700.noSoup, pattern = "^MT-")
 SAMN12614700.noSoup <- subset(SAMN12614700.noSoup, subset = percent.mt < 50)
 ```
 
@@ -352,18 +314,22 @@ Compare the original count matrix with the current:
 
 
 ```R
-# The [[ operator can add columns to object metadata. This is a great place to stash QC stats
-SRR10009414_control.noSoup.SCT[["percent.mt"]] <- PercentageFeatureSet(SRR10009414_control.noSoup.SCT, pattern = "^MT-")
 # Visualize QC metrics as a violin plot
 VlnPlot(SRR10009414_control.noSoup.SCT, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
 ![QC1](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC1.png)
 
-Here, we can identify a cluster with mitochondrial genes as the marker genes:
+Here, we can identify a cluster with mitochondrial genes as the marker genes. This cluster will be removed and the processing repeated prior to running doubletFinder.
 
 ```R
-SAMN12614700.filtered=subset(SAMN12614700.noSoup,idents=6,invert=TRUE)
+SAMN12614700.filtered=subset(SAMN12614700.noSoup,idents=2,invert=TRUE)
+SAMN12614700.filtered <- SCTransform(SAMN12614700.filtered, conserve.memory=TRUE,return.only.var.genes=TRUE)
+SAMN12614700.filtered <- RunPCA(object = SAMN12614700.filtered, verbose = FALSE)
+SAMN12614700.filtered <- RunUMAP(object = SAMN12614700.filtered, dims = 1:20, verbose = FALSE)
+SAMN12614700.filtered <- FindNeighbors(object = SAMN12614700.filtered, dims = 1:20, verbose = FALSE)
+SAMN12614700.filtered <- FindClusters(object = SAMN12614700.filtered, verbose = FALSE)
+
 ```
 
 ## Remove doublets
@@ -372,24 +338,27 @@ Next, doublets will be identified and removed by `doubletFinder`. (Note, you can
 
 ```R
 ## pK Identification (no ground-truth) 
-sweep.res.list_SRR10009414 <- paramSweep_v3(SRR10009414.NoSoup.no7.SCT, sct = TRUE, PCs = 1:20)
+sweep.res.list_SAMN12614700 <- paramSweep_v3(SAMN12614700.filtered, sct = TRUE, PCs = 1:15)
 
 ## Homotypic Doublet Proportion Estimate 
-homotypic.prop <- modelHomotypic(SRR10009414_control.noSoup.SCT@meta.data$seurat_clusters)  ## ex: annotations <- seu_kidney@meta.data$ClusteringResults
-nExp_poi <- round(0.075*nrow(SRR10009414_control.noSoup.SCT@meta.data))  ## Assuming 7.5% doublet formation rate - tailor for your dataset
+homotypic.prop <- modelHomotypic(SAMN12614700.filtered@meta.data$seurat_clusters)  ## ex: annotations <- seu_kidney@meta.data$ClusteringResults
+nExp_poi <- round(0.075*nrow(SAMN12614700.filtered@meta.data))  ## Assuming 7.5% doublet formation rate - tailor for your dataset
 nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
 
 ## Run DoubletFinder with varying classification stringencies 
-SRR10009414_control.noSoup.SCT <- doubletFinder_v3(SRR10009414_control.noSoup.SCT, PCs = 1:16, pN = 0.25, pK = 0.09, nExp = nExp_poi, reuse.pANN = FALSE, sct = TRUE)
+SAMN12614700.filtered <- doubletFinder_v3(SAMN12614700.filtered, PCs = 1:15, pN = 0.25, pK = 0.09, nExp = nExp_poi, reuse.pANN = FALSE, sct = TRUE)
+
+#Get the column name from the metaData e.g. DF.classifications_0.25_0.09_90
+head(SAMN12614700.filtered@meta.data) 
 
 #How many doublets?
-table(SRR10009414_control.noSoup.SCT@meta.data$DF.classifications_0.25_0.09_90)
+table(SAMN12614700.filtered@meta.data$DF.classifications_0.25_0.09_90)
 
 #Where are the doublets?
-DimPlot(SRR10009414_control.noSoup.SCT, group.by = "DF.classifications_0.25_0.09_90", pt.size = 0.01, cols = c("red", "azure3"))
+DimPlot(SAMN12614700.filtered, group.by = "DF.classifications_0.25_0.09_90", pt.size = 0.01, cols = c("red", "azure3"))
 
 # check the nUMI for doublet and singlet
-VlnPlot(SRR10009414_control.noSoup.SCT,
+VlnPlot(SAMN12614700.filtered,
         features = "nCount_RNA",
         pt.size = 0,
         group.by = "DF.classifications_0.25_0.09_90") + NoLegend()
@@ -398,7 +367,7 @@ VlnPlot(SRR10009414_control.noSoup.SCT,
 This code from the scrublet vignette can show how many doublets were present per-cluster:
 ```R
 #https://bookdown.org/ytliu13207/SingleCellMultiOmicsDataAnalysis/scrublet-doublet-validation.html
-df <- data.table(SRR10009414_control.noSoup.SCT@meta.data)
+df <- data.table(SAMN12614700.filtered@meta.data)
 sel.meta <- c("DF.classifications_0.25_0.09_90", "seurat_clusters", "orig.ident")
 df <- df[, sel.meta, with = FALSE]
 
@@ -430,20 +399,26 @@ Remove doublets and repeat the clustering:
 
 ```R
 #Remove the doublets, keeping only Singlets
-SRR10009414_control.noSoup.Singlet.SCT=subset(x = SRR10009414_control.noSoup.SCT, subset = DF.classifications_0.25_0.09_90 == 'Singlet')
-#Repeat the dimensionality reduction
-SRR10009414_control.noSoup.Singlet.SCT <- RunPCA(object = SRR10009414_control.noSoup.Singlet.SCT, verbose = FALSE)
-SRR10009414_control.noSoup.Singlet.SCT <- RunUMAP(object = SRR10009414_control.noSoup.Singlet.SCT, dims = 1:20, verbose = FALSE)
-SRR10009414_control.noSoup.Singlet.SCT <- FindNeighbors(object = SRR10009414_control.noSoup.Singlet.SCT, dims = 1:20, verbose = FALSE)
-SRR10009414_control.noSoup.Singlet.SCT <- FindClusters(object = SRR10009414_control.noSoup.Singlet.SCT, verbose = FALSE)
-plot1 <- DimPlot(object = SRR10009414_control.noSoup.Singlet.SCT, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform. noSoup. noDoublet.")
-plot1
+SAMN12614700.filtered=subset(x = SAMN12614700.filtered, subset = DF.classifications_0.25_0.09_90 == 'Singlet')
+
+#Repeat the processing with SCTransform, dimensionality reduction and clustering.
+#This time, SCTransform will be run in the full mode, i.e will return all genes 
+SAMN12614700.filtered <- SCTransform(SAMN12614700.filtered, conserve.memory=FALSE)
+SAMN12614700.filtered <- RunPCA(object = SAMN12614700.filtered, verbose = FALSE)
+SAMN12614700.filtered <- RunUMAP(object = SAMN12614700.filtered, dims = 1:15, verbose = FALSE)
+SAMN12614700.filtered <- FindNeighbors(object = SAMN12614700.filtered, dims = 1:15, verbose = FALSE)
+SAMN12614700.filtered <- FindClusters(object = SAMN12614700.filtered, verbose = FALSE)
+DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform. noSoup. noDoublet.")
 ```
 
 To check how many cells are in each cluster:
 ```R
 #How many cells are in each cluster?
-table(Idents(object = SRR10009414_control.noSoup.SCT))
+table(Idents(object = SAMN12614700.filtered))
+#Explore the clusters and QC metrics of the filtered data
+DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform")
+VlnPlot(SAMN12614700.filtered, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 1)
+
 ```
 
 Any threshold for filtering genes should be informed by your experimental design, including the number of cells in the dataset and the number of cells in the smallest cluster of interest [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).
@@ -451,11 +426,9 @@ Any threshold for filtering genes should be informed by your experimental design
 
 ## Labelling cluster cell type
 
-As the Cebola Lab works mainly with liver tissue, this pipeline will demonstrate methods to identify and label liver cell types.
+Next, the clusters will be identified as specific cell-types based on curated marker gene sets. Listed below are several methods used by published papers to annotate clusters of liver scRNA-seq data:
 
-Several previous scRNA-seq analysis of liver methods include:
-
-- [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3): removed contaminating circulatory cells based on clustering with scRNA from PBMCs. Obtained a **signature score** across a *curated* list of *known marker genes* per cell lineage in the liver. The score was defined as the mean expression of the signature marker genes. (for each cell lineage, calculated Pearson correlation across replicates).
+- [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3): removed contaminating circulatory cells based on clustering with scRNA from PBMCs. Obtained a signature score across a curated  list of known marker genes per cell lineage in the liver. The score was defined as the mean expression of the signature marker genes. 
 - [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7): "the cell-type identities for each cluster were determined manually using a compiled panel of available known hepatocyte/immune cell transcripts."
 - [Wang et al. 2021](https://www.nature.com/articles/s41598-021-98806-y): "we compared out manual annotation of clusters based on known cell-type-specific marker genes to that produced through automated classification using SingleR [SingleR](https://www.nature.com/articles/s41598-021-98806-y#ref-CR33)".
 - [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) "The expression of different combinations of genes was used to define scores and signatures using the Seurat PercentageFeatureSet function".
@@ -471,8 +444,43 @@ wget https://www.panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz
 awk -v FS="\t" '{if(($1=="Mm Hs" || $1=="Hs") && $3~/(Hepatocytes|Macrophages|Cholangiocytes|Endothelial cells|Hepatic stellate cells|Hepatoblasts|Hepatocytes|Kupffer cells|Macrophages|Mast cells|NK cells|T cells|B cells|Monocytes|Myoblasts|Myocytes)/) print $0}' PanglaoDB_markers_27_Mar_2020.tsv | cut -f 2,3 | grep -Ev "blood|aorta" > liver.markers
 ```
 
+```R
+markers=read.table('liver.markers',sep='\t')
+#subset the marker genes dataframe for the genes reported
+markers=subset(markers,markers[,1] %in% rownames(SAMN12614700.filtered@assays$SCT@counts))
+
+#PercentageFeatureSet
+for(x in unique(markers[,2])){
+    name=print(gsub(' ','.',x)) #replace spaces in the name with .
+    features=as.character(subset(markers,markers[,2]==x)[,1])
+    SAMN12614700.clusters[[name]]=PercentageFeatureSet(SAMN12614700.clusters,features = features)
+}
+```
+
+You can colour the UMAP plot according to the features, which are the specific cell-type % expression scores stored in the metaData.
+
+```R
+FeaturePlot(object = SAMN12614700.clusters, features = "Endothelial.cells") #unique(markers[,2]))
+FeaturePlot(object = SAMN12614700.clusters, features = "Hepatic.stellate.cells") 
+FeaturePlot(object = SAMN12614700.clusters, features = "Kupffer.cells") 
+```
+
+We can also plot a heatmap of the cell-type scores by creating a matrix with the mean score per cluster:
+
+```R
+metaData=SAMN12614700.clusters@meta.data
+cell.types=gsub(' ','.',unique(markers[,2]))
+cell_type.scores=aggregate(metaData[,cell.types], list(metaData$seurat_clusters), mean)
+
+heatmap(as.matrix(cell_type.scores[,-1]),scale="row",margins=c(10,6))
+```
+
 
 `Seurat PercentageFeatureSet`
+
+## Integrating biological replicates
+
+Also calculated each cell lineage, calculated Pearson correlation across replicates).
 
 # References
 

@@ -366,7 +366,6 @@ Here, we can identify a cluster with mitochondrial genes as the marker genes:
 SAMN12614700.filtered=subset(SAMN12614700.noSoup,idents=6,invert=TRUE)
 ```
 
-
 ## Remove doublets
 
 Next, doublets will be identified and removed by `doubletFinder`. (Note, you can check the number of informative dimensions with an ElbowPlot `ElbowPlot(SRR10009414_control.noSoup.SCT)`).
@@ -441,7 +440,6 @@ plot1 <- DimPlot(object = SRR10009414_control.noSoup.Singlet.SCT, label = TRUE, 
 plot1
 ```
 
-
 To check how many cells are in each cluster:
 ```R
 #How many cells are in each cluster?
@@ -462,6 +460,19 @@ Several previous scRNA-seq analysis of liver methods include:
 - [Wang et al. 2021](https://www.nature.com/articles/s41598-021-98806-y): "we compared out manual annotation of clusters based on known cell-type-specific marker genes to that produced through automated classification using SingleR [SingleR](https://www.nature.com/articles/s41598-021-98806-y#ref-CR33)".
 - [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) "The expression of different combinations of genes was used to define scores and signatures using the Seurat PercentageFeatureSet function".
 - [Aizarani et al. 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/). cells from select clusters were reanalyzed with [RaceID3](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R4) (see paper for parameters). [StemID](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R24) was run on resulting, filtered and feature-selected expression matrix, with target clusters "inferred by FateID using ASGR1 plus ALB and CXCL8 plus MMP7 as markers for hepatocyte and cholangiocyte lineage target clusters. Using the KRT19 and CFTR as mature cholangiocyte markers yields highly similar results."
+
+Here, we will calculate a cell-type score based on curated marker gene sets obtained by integrating marker genes from PanglaoDB and in-house curated gene sets. The curated gene set lists are available as a file in this Github (xxxxxx), with the pipeline used to generate this file described below:
+
+```sh
+#Download the PangloaDB markers 2020 file
+wget https://www.panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz 
+
+#Extract markers for liver cell types
+awk -v FS="\t" '{if(($1=="Mm Hs" || $1=="Hs") && $3~/(Hepatocytes|Macrophages|Cholangiocytes|Endothelial cells|Hepatic stellate cells|Hepatoblasts|Hepatocytes|Kupffer cells|Macrophages|Mast cells|NK cells|T cells|B cells|Monocytes|Myoblasts|Myocytes)/) print $0}' PanglaoDB_markers_27_Mar_2020.tsv | cut -f 2,3 | grep -Ev "blood|aorta" > liver.markers
+```
+
+
+`Seurat PercentageFeatureSet`
 
 # References
 

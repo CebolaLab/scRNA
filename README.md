@@ -298,7 +298,7 @@ SAMN12614700.noSoup[["percent.mt"]] <- PercentageFeatureSet(SAMN12614700.noSoup,
 VlnPlot(SAMN12614700, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_QC_plots1.png" height="400">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_QC_plots1.png"> 
 
 ```R
 #Remove droplets with %mtDNA>50
@@ -306,7 +306,7 @@ SAMN12614700.noSoup <- subset(SAMN12614700.noSoup, subset = percent.mt < 50)
 VlnPlot(SAMN12614700, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_QC_plots2.png" height="400">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_QC_plots2.png">
 
 Using the new, background-corrected count matrix, we will now explore the QC of the data and filter out low-quality cells and/or clusters. First, the initial pre-processing will be rerun:
 

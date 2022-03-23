@@ -22,11 +22,11 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 
 This pipeline has been developed by carefully reviewing current tools and best practises used in the analysis of 10X Genomics scRNA-seq data, as of March 2022. This Github will first present an overview of various available tools, followed by the Cebola Lab pipeline. Resources used are shown in the [References](#references) at the bottom of this page.
 
-#### Alignment, demultiplexing and quantification
+### Alignment, demultiplexing and quantification
 
 There are several alignment algorithms to choose from, including CellRanger, STARsolo, Alevin, Alevin-fry and Kallisto; these are compared in [Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741). This pipeline will use the 10X Genomics toolbox, **CellRanger**. If memory requirement is an issue, [Brüning et al. (2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) suggest STARsolo as an alternative.
 
-#### Secondary analysis
+### Secondary analysis
 
 CellRanger includes the demultiplexing of reads from individual droplets, or 'GEMs' (Gel Beads in EMulsion), based on unique barcodes. These should *in theory* correspond to unique single cells. However, droplets can contain more or less than one cell, or contain damaged or low quality cells. Therefore, the secondary analysis will assess the quality of the dataset and filter the data to retain only droplets with high-quality single cells. 
 
@@ -53,9 +53,10 @@ GEMs containing damaged cells can be identified using commonly-used metrics: **(
 Doublets have been removed in the past by simply removing cells with particularly high gene counts (e.g. with significant deviation). More sophisticated methods typically identify doublets based on their similarity with simulated doublets. Currently available tools include: doubletCells (Lun et al., 2016), Scrublet [(Wolock et al., 2019)](https://www.sciencedirect.com/science/article/pii/S2405471220301952#bib32), cxds (Bais and Kostka, 2020), bcds (Bais and Kostka, 2020), hybrid (Bais and Kostka, 2020), Solo [(Bernstein et al. 2020)](https://doi.org/10.1016/j.cels.2020.05.010), DoubletDetection (Gayoso and Shor, 2018), DoubletFinder ([McGinnis et al., 2019a](https://www.sciencedirect.com/science/article/pii/S2405471220304592#bib44), [2019b](https://www.sciencedirect.com/science/article/pii/S2405471220304592#bib45)), and DoubletDecon (DePasquale et al., 2019). These methods were recently compared by [Xi and Li (2021)](https://www.sciencedirect.com/science/article/pii/S2405471220304592), who report **DoubletFinder** and **Solo** as the top two performing methods. Briefly, **DoubletFinder** uses a *k*-nearest neighbors (kNN) algorithm to identify doublets based on their clustering with simulated doublets in principal component space. **Solo** (included in the scvi-tools suite from the Yosef Lab at UC Berkeley) uses a semi-supervised deep learning approach and claims improvements over DoubletFinder by not assuming linear gene expression circuits (note [Xi and Li (2021)](https://www.sciencedirect.com/science/article/pii/S2405471220304592) reported DoubletFinder as the top method).
 
 
-#### Downstream analysis
+### Downstream analysis
 
-**Feature selection, dimensionality reduction and visualisation**  
+> **Feature selection, dimensionality reduction and visualisation**    
+
 Including *clustering and cell identity*
 *TBC*
 

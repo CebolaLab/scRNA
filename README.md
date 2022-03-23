@@ -8,6 +8,8 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 3. [Workspace setup](#3-Workspace-setup)
 4. [Generate a reference transcriptome](#2-Generate-a-reference-transcriptome)
 5. [Cellranger count](#5-Cellranger-count)
+6. [Secondary analysis](#6-Secondary-analysis)
+7. [Cell type identity](#7-cell-type-identity)
 
 ## 1. Pipeline overview
 
@@ -129,7 +131,7 @@ cellranger count --nosecondary --id <ID> --transcriptome <PATH>
 #cellranger count --nosecondary --id SAMN12614700 --sample SRR10009414,SRR10009415,SRR10009416,SRR10009417 --transcriptome $GENOMEDIR/GRCh38 --fastqs SAMN12614700/
 ``` 
 
-## 4. Secondary analysis
+## 5. Secondary analysis
 
 An overview of the secondary analysis steps:
 
@@ -424,7 +426,7 @@ VlnPlot(SAMN12614700.filtered, features = c("nFeature_RNA", "nCount_RNA", "perce
 Any threshold for filtering genes should be informed by your experimental design, including the number of cells in the dataset and the number of cells in the smallest cluster of interest [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).
 * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-## Labelling cluster cell type
+## 6. Cell type identity
 
 Next, the clusters will be identified as specific cell-types based on curated marker gene sets. Listed below are several methods used by published papers to annotate clusters of liver scRNA-seq data:
 

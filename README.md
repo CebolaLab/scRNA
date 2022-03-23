@@ -47,15 +47,16 @@ Others?? *tbc* **Variance stabilization**. The aim here is to correct for the re
 
 #### Downstream analysis
 
-**Feature selection, dimensionality reduction and visualisation**. 
+**Feature selection, dimensionality reduction and visualisation**  
 Including *clustering and cell identity*
+*TBC*
 
 #### Dataset integration
 
 *TBC*
 
-#### Differential expression and pseudobulk expression
-
+#### Differential expression and pseudobulk expression  
+*TBC*
 
 ## 3. Workspace setup
 

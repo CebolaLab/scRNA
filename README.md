@@ -217,7 +217,7 @@ These initial clusters can be visualised in a UMAP plot. Note that these cluster
 DimPlot(object = SAMN12614700, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("preliminary clustering - sctransform")
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/UMAP2.png" width="400">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_UMAP1.png" width="400">
 
 Add the UMAP coordinates to the metaData for compatability with SoupX:
 
@@ -241,7 +241,7 @@ head(SAMN12614700@meta.data)
 ```
 
 The UMAP coordinates for each barcode are in the UMAP_1 and UMAP_2 columns:
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/metaData1.png" width="800">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_metaData.png" width="800">
 
 ### SoupX
 
@@ -272,20 +272,20 @@ plotMarkerDistribution(sc)
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/soup.png" height="400">
 
-You can highlight cells within the UMAP plot where a gene is expressed *at all* vs expressed above the background. For example for the mitochondrial gene `MT-CO1`. 
+You can highlight cells within the UMAP plot where a gene is expressed *at all* vs expressed above the background. For example for the highly expressed hepatocyte gene *ALB*. 
 
 ```R
 #Plot the expression of an example gene
-dd$CO1 = sc$toc["MT-CO1", ] 
-ggplot(dd, aes(UMAP_1, UMAP_2)) + geom_point(aes(colour = CO1 > 0))
-plotMarkerMap(sc, "MT-CO1",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
+dd$ALB = sc$toc["ALB", ] 
+ggplot(dd, aes(UMAP_1, UMAP_2)) + geom_point(aes(colour = ALB > 0))
+plotMarkerMap(sc, "ALB",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
 ```
 
-Cells where MT-CO1 is expressed at >1 count:  
-![MT-CO1_all](https://github.com/CebolaLab/scRNA/blob/main/Figures/MT-CO1.1.png)
+Cells where ALB is expressed at >1 count:  
+![ALB.png](https://github.com/CebolaLab/scRNA/blob/main/Figures/ALB.png)
 
-Cells where MT-CO1 has significant expression, above that of the background "soup" contamination in all cells:  
-![MT-CO1_significant](https://github.com/CebolaLab/scRNA/blob/main/Figures/MT-CO1.2.png)
+Cells where ALB has significant expression, above that of the background "soup" contamination in all cells:  
+![ALB2.png](https://github.com/CebolaLab/scRNA/blob/main/Figures/ALB2.png)
 
 Create a Seurat data object from the four corrected replicates. This step will involve some initial filtering, to excluded genes detected in less than 3 cells and to exclude cells with less than 200 detected genes. 
 
@@ -293,11 +293,20 @@ Create a Seurat data object from the four corrected replicates. This step will i
 
 ```R 
 SAMN12614700.noSoup <- CreateSeuratObject(counts = out, project = "SAMN12614700",  min.cells = 3, min.features = 200)
-
-#Remove droplets with %mtDNA>50
 SAMN12614700.noSoup[["percent.mt"]] <- PercentageFeatureSet(SAMN12614700.noSoup, pattern = "^MT-")
-SAMN12614700.noSoup <- subset(SAMN12614700.noSoup, subset = percent.mt < 50)
+#Look at the QC distribution
+VlnPlot(SAMN12614700, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_QC_plots1.png" height="400">
+
+```R
+#Remove droplets with %mtDNA>50
+SAMN12614700.noSoup <- subset(SAMN12614700.noSoup, subset = percent.mt < 50)
+VlnPlot(SAMN12614700, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_QC_plots2.png" height="400">
 
 Using the new, background-corrected count matrix, we will now explore the QC of the data and filter out low-quality cells and/or clusters. First, the initial pre-processing will be rerun:
 

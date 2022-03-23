@@ -282,10 +282,10 @@ plotMarkerMap(sc, "ALB",DR=sc$metaData[,c('UMAP_1','UMAP_2')])
 ```
 
 Cells where ALB is expressed at >1 count:  
-![ALB.png](https://github.com/CebolaLab/scRNA/blob/main/Figures/ALB.png)
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/ALB.png" width="400">
 
 Cells where ALB has significant expression, above that of the background "soup" contamination in all cells:  
-![ALB2.png](https://github.com/CebolaLab/scRNA/blob/main/Figures/ALB2.png)
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/ALB2.png" width="400">
 
 Create a Seurat data object from the four corrected replicates. This step will involve some initial filtering, to excluded genes detected in less than 3 cells and to exclude cells with less than 200 detected genes. 
 

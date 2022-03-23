@@ -345,6 +345,9 @@ srat.17 <- CreateSeuratObject(counts = out.17, project = "SAMN12614700",  min.ce
 SAMN12614700.noSoup <- merge(srat.14, y = c(srat.15,srat.16,srat.17),
                       add.cell.ids = c("SRR10009414", "SRR10009415","SRR10009416","SRR10009417"), 
                       project = "SAMN12614700")
+
+#Remove droplets with %mtDNA>50
+SAMN12614700.noSoup <- subset(SAMN12614700.noSoup, subset = percent.mt < 50)
 ```
 
 Using the new, background-corrected count matrix, we will now explore the QC of the data and filter out low-quality cells and/or clusters. First, the initial pre-processing will be rerun:
@@ -360,7 +363,7 @@ plot1 <- DimPlot(object = SAMN12614700.noSoup, label = TRUE, reduction = "umap")
 ```
 Compare the original count matrix with the current:
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/comparison1.png" height="400">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/comparison1.png" height="200">
 
 
 ```R
@@ -372,17 +375,12 @@ VlnPlot(SRR10009414_control.noSoup.SCT, features = c("nFeature_RNA", "nCount_RNA
 
 ![QC1](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC1.png)
 
-Here, the data can be filtered to remove outliers. This pipeline will preferentially filter the data using clustering later on, but here we will remove cells with %mtDNA > 50%.
+Here, we can identify a cluster with mitochondrial genes as the marker genes:
 
 ```R
-#Remove droplets with %mtDNA>50
-SRR10009414_control.noSoup.SCT <- subset(SRR10009414_control.noSoup.SCT, subset = percent.mt < 50)
-#Rerun dimensionality reduction
-SRR10009414_control.noSoup.SCT <- RunPCA(object = SRR10009414_control.noSoup.SCT, verbose = FALSE)
-SRR10009414_control.noSoup.SCT <- RunUMAP(object = SRR10009414_control.noSoup.SCT, dims = 1:20, verbose = FALSE)
-SRR10009414_control.noSoup.SCT <- FindNeighbors(object = SRR10009414_control.noSoup.SCT, dims = 1:20, verbose = FALSE)
-SRR10009414_control.noSoup.SCT <- FindClusters(object = SRR10009414_control.noSoup.SCT, verbose = FALSE)
+SAMN12614700.filtered=subset(SAMN12614700.noSoup,idents=6,invert=TRUE)
 ```
+
 
 ## Remove doublets
 
@@ -468,8 +466,17 @@ table(Idents(object = SRR10009414_control.noSoup.SCT))
 Any threshold for filtering genes should be informed by your experimental design, including the number of cells in the dataset and the number of cells in the smallest cluster of interest [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).
 * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-`DropletUtils`
+## Labelling cluster cell type
 
+As the Cebola Lab works mainly with liver tissue, this pipeline will demonstrate methods to identify and label liver cell types.
+
+Several previous scRNA-seq analysis of liver methods include:
+
+- [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3): removed contaminating circulatory cells based on clustering with scRNA from PBMCs. Obtained a **signature score** across a *curated* list of *known marker genes* per cell lineage in the liver. The score was defined as the mean expression of the signature marker genes. (for each cell lineage, calculated Pearson correlation across replicates).
+- [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7): "the cell-type identities for each cluster were determined manually using a compiled panel of available known hepatocyte/immune cell transcripts."
+- [Wang et al. 2021](https://www.nature.com/articles/s41598-021-98806-y): "we compared out manual annotation of clusters based on known cell-type-specific marker genes to that produced through automated classification using SingleR [SingleR](https://www.nature.com/articles/s41598-021-98806-y#ref-CR33)".
+- [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) "The expression of different combinations of genes was used to define scores and signatures using the Seurat PercentageFeatureSet function".
+- [Aizarani et al. 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/). cells from select clusters were reanalyzed with [RaceID3](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R4) (see paper for parameters). [StemID](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R24) was run on resulting, filtered and feature-selected expression matrix, with target clusters "inferred by FateID using ASGR1 plus ALB and CXCL8 plus MMP7 as markers for hepatocyte and cholangiocyte lineage target clusters. Using the KRT19 and CFTR as mature cholangiocyte markers yields highly similar results."
 
 ```R
 #Recommended pipeline by the author of DoubletFinder

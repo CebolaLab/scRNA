@@ -510,7 +510,7 @@ cell_type.scores=aggregate(metaData[,cell.types], list(metaData$seurat_clusters)
 heatmap(as.matrix(cell_type.scores[,-1]),scale="none",margins=c(10,6),labRow=cell_type.scores[,1])
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/score_heatplot.png" height="400">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/score_heatplot.png" height="500">
 
 `Seurat PercentageFeatureSet`
 

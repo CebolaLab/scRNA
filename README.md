@@ -445,7 +445,7 @@ VlnPlot(SAMN12614700.filtered, features = c("nFeature_RNA", "nCount_RNA", "perce
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/filtered_UMAP.png" height="400" >  
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/filtered_violin.png" height="400" >
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/filtered_violin.png">
 
 
 Any threshold for filtering genes should be informed by your experimental design, including the number of cells in the dataset and the number of cells in the smallest cluster of interest [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).

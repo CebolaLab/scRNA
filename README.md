@@ -413,6 +413,9 @@ df[, 2:3] %>% map( ~ {
   
 })
 ```
+
+We can see here that, of the new clusters, cluster 6 was made up of almost 75% doublets:  
+
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_clusters.png" height="400" >
 
 Remove doublets and repeat the clustering:
@@ -438,8 +441,12 @@ table(Idents(object = SAMN12614700.filtered))
 #Explore the clusters and QC metrics of the filtered data
 DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform")
 VlnPlot(SAMN12614700.filtered, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 1)
-
 ```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/filtered_UMAP.png" height="400" >  
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/filtered_violin.png" height="400" >
+
 
 Any threshold for filtering genes should be informed by your experimental design, including the number of cells in the dataset and the number of cells in the smallest cluster of interest [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).
 * * * * * * * * * * * * * * * * * * * * * * * * * *

@@ -258,9 +258,9 @@ sc = setClusters(sc, setNames(metaData[colnames(sc$toc),]$seurat_clusters, colna
 sc = setDR(sc, metaData[colnames(sc$toc), c("UMAP_1", "UMAP_2")])
 
 #Estimate the contaminating fraction
-sc.14 = autoEstCont(sc) 
+sc = autoEstCont(sc) 
 # Clean the data
-out14 = adjustCounts(sc)
+out = adjustCounts(sc)
 ```
 
 The output data includes the genes whose contaminating reads make a significant contribution to the "soup", i.e. contribute the *ambient gene expression*. These will most likely include several mitochondrial genes.
@@ -272,7 +272,7 @@ plotMarkerDistribution(sc)
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/soup.png" height="400">
 
-You can highlight cells within the UMAP plot where a gene is expressed *at all* vs expressed above the background. For example for the highly expressed hepatocyte gene *ALB*. 
+The UMAP plot can be used to explore the ambient gene expression. For example, you can highlight cells where a gene is expressed *at all* (i.e. at least one count detected) vs cells where the gene is significantly expressed *above* the background. We can explore this below for the highly expressed hepatocyte gene, *ALB*. (Note that this example data is from non-parenchymal cells, or NPCs, and should not contain hepatocytes).
 
 ```R
 #Plot the expression of an example gene
@@ -303,12 +303,12 @@ VlnPlot(SAMN12614700, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), 
 ```R
 #Remove droplets with %mtDNA>50
 SAMN12614700.noSoup <- subset(SAMN12614700.noSoup, subset = percent.mt < 50)
-VlnPlot(SAMN12614700, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(SAMN12614700.noSoup, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_QC_plots2.png">
 
-Using the new, background-corrected count matrix, we will now explore the QC of the data and filter out low-quality cells and/or clusters. First, the initial pre-processing will be rerun:
+Here, we can already see a suspicous cluster, cluster 2, which has a higher distribution of %mtDNA expression and lower number of counts and features than other clusters. We repeat the processing and define marker genes, then we can check what marker genes have been defined for cluster 2. 
 
 ```R
 #SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
@@ -317,30 +317,30 @@ SAMN12614700.noSoup <- RunPCA(object = SAMN12614700.noSoup, verbose = FALSE)
 SAMN12614700.noSoup <- RunUMAP(object = SAMN12614700.noSoup, dims = 1:20, verbose = FALSE)
 SAMN12614700.noSoup <- FindNeighbors(object = SAMN12614700.noSoup, dims = 1:20, verbose = FALSE)
 SAMN12614700.noSoup <- FindClusters(object = SAMN12614700.noSoup, verbose = FALSE)
-plot1 <- DimPlot(object = SAMN12614700.noSoup, label = TRUE, reduction = "umap") + NoLegend() + ggtitle("sctransform")
-```
-Compare the original count matrix with the current:
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/comparison1.png" height="200">
+#Find cluster markers
+SAMN12614700.markers.noSoup <- FindAllMarkers(SAMN12614700.noSoup, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+markers.noSoup=SAMN12614700.markers.noSoup %>%
+    group_by(cluster) %>%
+    slice_max(n = 5, order_by = avg_log2FC)
 
-
-```R
-# Visualize QC metrics as a violin plot
-VlnPlot(SRR10009414_control.noSoup.SCT, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+markers.noSoup[markers.noSoup$cluster==2,]
 ```
 
-![QC1](https://github.com/CebolaLab/scRNA/blob/main/Figures/QC1.png)
+We can see that the marker genes for cluster 2 are mitochondrial genes, a clear indication that this cluster contains low-quality, possibly ruptured, cells. 
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/cluster2.png">
 
-Here, we can identify a cluster with mitochondrial genes as the marker genes. This cluster will be removed and the processing repeated prior to running doubletFinder.
+We remove cluster 2 and repeat the processing, prior to running doubletFinder.
 
 ```R
+#Remove cluster 2
 SAMN12614700.filtered=subset(SAMN12614700.noSoup,idents=2,invert=TRUE)
+#Repeat the processing
 SAMN12614700.filtered <- SCTransform(SAMN12614700.filtered, conserve.memory=TRUE,return.only.var.genes=TRUE)
 SAMN12614700.filtered <- RunPCA(object = SAMN12614700.filtered, verbose = FALSE)
 SAMN12614700.filtered <- RunUMAP(object = SAMN12614700.filtered, dims = 1:20, verbose = FALSE)
 SAMN12614700.filtered <- FindNeighbors(object = SAMN12614700.filtered, dims = 1:20, verbose = FALSE)
 SAMN12614700.filtered <- FindClusters(object = SAMN12614700.filtered, verbose = FALSE)
-
 ```
 
 ## Remove doublets

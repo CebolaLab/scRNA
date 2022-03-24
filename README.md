@@ -515,10 +515,10 @@ heatmap(as.matrix(cell_type.scores[,-1]),scale="none",margins=c(10,6),labRow=cel
 We can zoom in on, for example, which cluster is *bona dife* LSECs (sinusoidal endothelial cells):
 
 ```R
-DoHeatmap(object = SAMN12614700.filtered, features = unique(LSEC.markers[,1])) #LSEC_markers)
+DoHeatmap(object = SAMN12614700.filtered, features = unique(LSEC.markers[,1])) 
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_heatmap.png" height="500">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_heatmap.png" height="700">
 
 ## Integrating biological replicates
 

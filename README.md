@@ -332,7 +332,7 @@ We can see that the marker genes for cluster 2 are mitochondrial genes, a clear 
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/cluster2.png" height="200" >
 
-We remove cluster 2 and repeat the processing, prior to running doubletFinder.
+We remove cluster 2 and repeat the processing. Notably, we can also see some other suspicious clusters, such as cluster 13. However, the marker genes for cluster 13 are more informative (*ALB*, *APOC3*, *APOA1*) and so we will keep it (for now!). Cluster 13 also has a higher distribution of counts so may contain a higher number of doublets, i.e. drolets with two (or more!) cells. These will be investigated in the next step.
 
 ```R
 #Remove cluster 2
@@ -376,6 +376,11 @@ VlnPlot(SAMN12614700.filtered,
         pt.size = 0,
         group.by = "DF.classifications_0.25_0.09_90") + NoLegend()
 ```
+
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_UMAP.png" height="300" >
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_counts.png" height="300" >
 
 This code from the scrublet vignette can show how many doublets were present per-cluster:
 ```R

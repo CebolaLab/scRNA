@@ -328,7 +328,7 @@ markers.noSoup[markers.noSoup$cluster==2,]
 ```
 
 We can see that the marker genes for cluster 2 are mitochondrial genes, a clear indication that this cluster contains low-quality, possibly ruptured, cells. 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/cluster2.png" height="300" >
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/cluster2.png" height="200" >
 
 We remove cluster 2 and repeat the processing, prior to running doubletFinder.
 

@@ -536,6 +536,8 @@ SAMN12614700.filtered <- RenameIdents(SAMN12614700.filtered, new.cluster.ids)
 DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLegend()
 ```
 
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/labelled_UMAP.png" height="500">
+
 ## Integrating biological replicates
 
 Also calculated each cell lineage, calculated Pearson correlation across replicates).

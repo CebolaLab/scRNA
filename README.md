@@ -457,9 +457,9 @@ Next, the clusters will be identified as specific cell-types based on curated ma
 
 - [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3): removed contaminating circulatory cells based on clustering with scRNA from PBMCs. Obtained a signature score across a curated  list of known marker genes per cell lineage in the liver. The score was defined as the mean expression of the signature marker genes. 
 - [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7): "the cell-type identities for each cluster were determined manually using a compiled panel of available known hepatocyte/immune cell transcripts."
-- [Wang et al. 2021](https://www.nature.com/articles/s41598-021-98806-y): "we compared out manual annotation of clusters based on known cell-type-specific marker genes to that produced through automated classification using SingleR [SingleR](https://www.nature.com/articles/s41598-021-98806-y#ref-CR33)".
+- [Wang et al. (2021)](https://www.nature.com/articles/s41598-021-98806-y): "we compared out manual annotation of clusters based on known cell-type-specific marker genes to that produced through automated classification using [SingleR](https://www.nature.com/articles/s41598-021-98806-y#ref-CR33)".
 - [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) "The expression of different combinations of genes was used to define scores and signatures using the Seurat PercentageFeatureSet function".
-- [Aizarani et al. 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/). cells from select clusters were reanalyzed with [RaceID3](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R4) (see paper for parameters). [StemID](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R24) was run on resulting, filtered and feature-selected expression matrix, with target clusters "inferred by FateID using ASGR1 plus ALB and CXCL8 plus MMP7 as markers for hepatocyte and cholangiocyte lineage target clusters. Using the KRT19 and CFTR as mature cholangiocyte markers yields highly similar results."
+- [Aizarani et al. (2019)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/). cells from select clusters were reanalyzed with [RaceID3](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R4) (see paper for parameters). [StemID](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R24) was run on resulting, filtered and feature-selected expression matrix, with target clusters "inferred by FateID using ASGR1 plus ALB and CXCL8 plus MMP7 as markers for hepatocyte and cholangiocyte lineage target clusters. Using the KRT19 and CFTR as mature cholangiocyte markers yields highly similar results."
 
 Here, we will calculate a cell-type score based on curated marker gene sets obtained by integrating marker genes from PanglaoDB and in-house curated gene sets. The curated gene set lists are available as a file in this Github (xxxxxx), with the pipeline used to generate this file described below:
 
@@ -473,29 +473,33 @@ awk -v FS="\t" '{if(($1=="Mm Hs" || $1=="Hs") && $3~/(Hepatocytes|Macrophages|Ch
 
 ```R
 markers=read.table('liver.markers',sep='\t')
+LSEC.markers=read.table('LSEC.markers')
 #subset the marker genes dataframe for the genes reported
 markers=subset(markers,markers[,1] %in% rownames(SAMN12614700.filtered@assays$SCT@counts))
+LSEC.markers=subset(LSEC.markers,LSEC.markers[,1] %in% rownames(SAMN12614700.filtered@assays$SCT@counts))
+#Combine the database and in-house LSEC marker list
+markers=rbind(markers,cbind(V1=LSEC.markers,V2='LSEC'))
 
 #PercentageFeatureSet
 for(x in unique(markers[,2])){
     name=print(gsub(' ','.',x)) #replace spaces in the name with .
     features=as.character(subset(markers,markers[,2]==x)[,1])
-    SAMN12614700.clusters[[name]]=PercentageFeatureSet(SAMN12614700.clusters,features = features)
+    SAMN12614700.filtered[[name]]=PercentageFeatureSet(SAMN12614700.filtered,features = features)
 }
 ```
 
 You can colour the UMAP plot according to the features, which are the specific cell-type % expression scores stored in the metaData.
 
 ```R
-FeaturePlot(object = SAMN12614700.clusters, features = "Endothelial.cells") #unique(markers[,2]))
-FeaturePlot(object = SAMN12614700.clusters, features = "Hepatic.stellate.cells") 
-FeaturePlot(object = SAMN12614700.clusters, features = "Kupffer.cells") 
+FeaturePlot(object = SAMN12614700.filtered, features = "Endothelial.cells") #unique(markers[,2]))
 ```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endothelial_score_UMAP.png">
 
 We can also plot a heatmap of the cell-type scores by creating a matrix with the mean score per cluster:
 
 ```R
-metaData=SAMN12614700.clusters@meta.data
+metaData=SAMN12614700.filtered@meta.data
 cell.types=gsub(' ','.',unique(markers[,2]))
 cell_type.scores=aggregate(metaData[,cell.types], list(metaData$seurat_clusters), mean)
 

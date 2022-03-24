@@ -498,7 +498,7 @@ You can colour the UMAP plot according to the features, which are the specific c
 FeaturePlot(object = SAMN12614700.filtered, features = "Endothelial.cells") #unique(markers[,2]))
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endothelial_score_UMAP.png">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endothelial_score_UMAP.png" | height="300">
 
 We can also plot a heatmap of the cell-type scores by creating a matrix with the mean score per cluster:
 

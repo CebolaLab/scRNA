@@ -303,6 +303,13 @@ VlnPlot(SAMN12614700, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), 
 ```R
 #Remove droplets with %mtDNA>50
 SAMN12614700.noSoup <- subset(SAMN12614700.noSoup, subset = percent.mt < 50)
+#Repeat the processing
+SAMN12614700.noSoup <- SCTransform(SAMN12614700.noSoup, conserve.memory=TRUE,return.only.var.genes=TRUE)
+SAMN12614700.noSoup <- RunPCA(object = SAMN12614700.noSoup, verbose = FALSE)
+SAMN12614700.noSoup <- RunUMAP(object = SAMN12614700.noSoup, dims = 1:20, verbose = FALSE)
+SAMN12614700.noSoup <- FindNeighbors(object = SAMN12614700.noSoup, dims = 1:20, verbose = FALSE)
+SAMN12614700.noSoup <- FindClusters(object = SAMN12614700.noSoup, verbose = FALSE)
+#Plot the QC measures for the new clusters
 VlnPlot(SAMN12614700.noSoup, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
@@ -311,23 +318,18 @@ VlnPlot(SAMN12614700.noSoup, features = c("nFeature_RNA", "nCount_RNA", "percent
 Here, we can already see a suspicous cluster, cluster 2, which has a higher distribution of %mtDNA expression and lower number of counts and features than other clusters. We repeat the processing and define marker genes, then we can check what marker genes have been defined for cluster 2. 
 
 ```R
-#SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
-SAMN12614700.noSoup <- SCTransform(SAMN12614700.noSoup, conserve.memory=TRUE,return.only.var.genes=TRUE)
-SAMN12614700.noSoup <- RunPCA(object = SAMN12614700.noSoup, verbose = FALSE)
-SAMN12614700.noSoup <- RunUMAP(object = SAMN12614700.noSoup, dims = 1:20, verbose = FALSE)
-SAMN12614700.noSoup <- FindNeighbors(object = SAMN12614700.noSoup, dims = 1:20, verbose = FALSE)
-SAMN12614700.noSoup <- FindClusters(object = SAMN12614700.noSoup, verbose = FALSE)
-
 #Find cluster markers
 SAMN12614700.markers.noSoup <- FindAllMarkers(SAMN12614700.noSoup, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
 markers.noSoup=SAMN12614700.markers.noSoup %>%
     group_by(cluster) %>%
     slice_max(n = 5, order_by = avg_log2FC)
 
+#What are the marker genes of cluster 2?
 markers.noSoup[markers.noSoup$cluster==2,]
 ```
 
-We can see that the marker genes for cluster 2 are mitochondrial genes, a clear indication that this cluster contains low-quality, possibly ruptured, cells. 
+We can see that the marker genes for cluster 2 are mitochondrial genes, a clear indication that this cluster contains low-quality, possibly ruptured, cells.  
+
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/cluster2.png" height="200" >
 
 We remove cluster 2 and repeat the processing, prior to running doubletFinder.

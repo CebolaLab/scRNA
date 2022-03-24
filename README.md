@@ -471,6 +471,10 @@ wget https://www.panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz
 awk -v FS="\t" '{if(($1=="Mm Hs" || $1=="Hs") && $3~/(Hepatocytes|Macrophages|Cholangiocytes|Endothelial cells|Hepatic stellate cells|Hepatoblasts|Hepatocytes|Kupffer cells|Macrophages|Mast cells|NK cells|T cells|B cells|Monocytes|Myoblasts|Myocytes)/) print $0}' PanglaoDB_markers_27_Mar_2020.tsv | cut -f 2,3 | grep -Ev "blood|aorta" > liver.markers
 ```
 
+Here, we will use Seurat `PercentageFeatureSet`:
+
+*"This function enables you to easily calculate the percentage of all the counts belonging to a subset of the possible features for each cell. This is useful when trying to compute the percentage of transcripts that map to mitochondrial genes for example. The calculation here is simply the column sum of the matrix present in the counts slot for features belonging to the set divided by the column sum for all features times 100."*
+
 ```R
 markers=read.table('liver.markers',sep='\t')
 LSEC.markers=read.table('LSEC.markers')

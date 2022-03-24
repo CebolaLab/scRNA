@@ -413,6 +413,7 @@ df[, 2:3] %>% map( ~ {
   
 })
 ```
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_clusters.png" height="400" >
 
 Remove doublets and repeat the clustering:
 

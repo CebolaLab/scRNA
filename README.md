@@ -510,9 +510,15 @@ cell_type.scores=aggregate(metaData[,cell.types], list(metaData$seurat_clusters)
 heatmap(as.matrix(cell_type.scores[,-1]),scale="none",margins=c(10,6),labRow=cell_type.scores[,1])
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/score_heatplot.png" height="500">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/score_heatplot.png" height="500">  
 
-`Seurat PercentageFeatureSet`
+We can zoom in on, for example, which cluster is *bona dife* LSECs (sinusoidal endothelial cells):
+
+```R
+DoHeatmap(object = SAMN12614700.filtered, features = unique(LSEC.markers[,1])) #LSEC_markers)
+```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_heatmap.png" height="500">
 
 ## Integrating biological replicates
 

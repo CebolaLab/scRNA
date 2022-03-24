@@ -378,9 +378,9 @@ VlnPlot(SAMN12614700.filtered,
 ```
 
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_UMAP.png" height="300" >
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_UMAP.png" height="400" >
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_counts.png" height="300" >
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_counts.png" height="400" >
 
 This code from the scrublet vignette can show how many doublets were present per-cluster:
 ```R

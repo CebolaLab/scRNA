@@ -518,6 +518,8 @@ We can zoom in on, for example, which cluster is *bona dife* LSECs (sinusoidal e
 DoHeatmap(object = SAMN12614700.filtered, features = unique(LSEC.markers[,1])) 
 ```
 
+We can see that cluster 3 stands out significantly as LSECs!  
+
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_heatmap.png" height="700">
 
 ## Integrating biological replicates

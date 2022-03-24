@@ -512,7 +512,17 @@ heatmap(as.matrix(cell_type.scores[,-1]),scale="none",margins=c(10,6),labRow=cel
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/score_heatplot.png" height="500">  
 
-We can zoom in on, for example, which cluster is *bona dife* LSECs (sinusoidal endothelial cells):
+
+Based on the this plot, we can see that clusters 3,7,9,1 and 0 score positively as endothelial cells. We can look in more granular detail at the gene expression levels:
+
+```R
+DoHeatmap(object = SAMN12614700.filtered, features = unique(subset(markers,markers[,2]=='Endothelial cells')[,1]))
+```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endo_heatmap.png" height="700">
+
+
+Notably, liver endothelial cells include highly specialised LSECs (liver sinusoidal endothelial cells). We can plot the expression of our LSEC markers:
 
 ```R
 DoHeatmap(object = SAMN12614700.filtered, features = unique(LSEC.markers[,1])) 

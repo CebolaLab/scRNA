@@ -522,6 +522,20 @@ We can see that cluster 3 stands out significantly as LSECs!
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_heatmap.png" height="700">
 
+
+Using this information we can relabel the clusters:
+
+```R
+new.cluster.ids=c('0'='Endothelial','1'='Endothelial','2'='Monocytes','3'='LSEC','4'='NK/T/macrophages','5'='B cells','6'='Hepatocytes/cholangiocytes','7'='Endothelial','8'='Kupffer cells','9'='Endothelial')
+
+#Create a backup of the meta data and remove the columns with the cluster scores which will facilitate the correct labelling 
+metaData=SAMN12614700.filtered@meta.data
+SAMN12614700.filtered@meta.data=SAMN12614700.filtered@meta.data[,1:8]
+SAMN12614700.filtered <- RenameIdents(SAMN12614700.filtered, new.cluster.ids)
+
+DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLegend()
+```
+
 ## Integrating biological replicates
 
 Also calculated each cell lineage, calculated Pearson correlation across replicates).

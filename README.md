@@ -377,8 +377,9 @@ VlnPlot(SAMN12614700.filtered,
         group.by = "DF.classifications_0.25_0.09_90") + NoLegend()
 ```
 
+Which cells were marked as doublets?  
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_UMAP.png" height="400" >
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_UMAP.png" height="500" >
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_counts.png" height="400" >
 

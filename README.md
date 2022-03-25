@@ -35,7 +35,10 @@ The studies listed below are published scRNA-seq studies of *human* liver:
 - [Ramachandran et al. (2019), *Nature*.](https://www.nature.com/articles/s41586-019-1631-3) - scRNA-seq of both healthy and cirrhotic liver, including NAFLD.
 - [Payen et al. (2021)](https://www.jhep-reports.eu/article/S2589-5559(21)00054-9/fulltext) - >25,000 human liver cells
 - [Wang et al. (2021), *Scientific Reports*](https://www.nature.com/articles/s41598-021-98806-y) - 17,810 non-parenchymal cells from six healthy human livers. Integrated with public bulk/scRNA-seq of NASH livers.
-- [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) 
+
+Additional related studies:
+- [Rocque et al. (2021), *Front. Immunol.*](https://doi.org/10.3389/fimmu.2021.679521) - integrate published studies to create a "RNASeq Meta-Atlas"
+- [Brancale and Vilarinho]() not sure?
 
 ### Hepatic cell types
 

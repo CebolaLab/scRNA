@@ -36,12 +36,29 @@ The studies listed below are published scRNA-seq studies of *human* liver:
 - [Wang et al. (2021)](https://www.nature.com/articles/s41598-021-98806-y)
 - [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) 
 
-These scRNA-seq studies of the liver have uncovered many novel 
+### Hepatic cell types
+
+These scRNA-seq studies of the liver have uncovered many novel cell types and states in both healthy and diseased human liver. Briefly, the cell types found in human liver include:
+
+Parenchymal cells:
+- **Hepatocytes**
+
+Non-parenchymal cells (NPCs):
+- **Endothelial cells (sinusoidal)**: liver sinusoidal endothelial cells, or 'LSECs'
+- **Endothelial cells (vascular)**
+- **Endothelial cells (arterial)**
+- **Cholangiocytes**: epithelial cells which line the bile ducts
+- **Kupffer cells**: liver resident macrophages
+
+Bloodborne cells:
+- T-cells
+- NK-like cells
+- B cells 
+- Plasma cells 
+
+For example, [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) reported two distinct populations of liver macrophages, 
 
 [MacParland et al. (2018)]
-
-### The Liver and it's cells
-
 
 
 ### Alignment, demultiplexing and quantification

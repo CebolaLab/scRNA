@@ -33,10 +33,10 @@ The studies listed below are published scRNA-seq studies of *human* liver:
 - [MacParland et al. (2018), *Nature Comms*.](https://www.nature.com/articles/s41467-018-06318-7) - the first scRNA-seq atlas of human liver (5 livers, 8,444 cells)
 - [Aizarani et al. (2019), *Nature*.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) - Nine human donors, healthy livers (~10,000 cells).
 - [Ramachandran et al. (2019), *Nature*.](https://www.nature.com/articles/s41586-019-1631-3) - scRNA-seq of both healthy and cirrhotic liver, including NAFLD.
+- [Zhang et al. (2020), *Front. Oncol.*](https://www.frontiersin.org/articles/10.3389/fonc.2020.596318/full) - scRNA of HCC livers with cirrhosis
 - [Payen et al. (2021)](https://www.jhep-reports.eu/article/S2589-5559(21)00054-9/fulltext) - >25,000 human liver cells
 - [Wang et al. (2021), *Scientific Reports*](https://www.nature.com/articles/s41598-021-98806-y) - 17,810 non-parenchymal cells from six healthy human livers. Integrated with public bulk/scRNA-seq of NASH livers.
 
-- [Zhang et al. (2020), *Front. Oncol.*](https://www.frontiersin.org/articles/10.3389/fonc.2020.596318/full) - scRNA of HCC livers with cirrhosis
 
 Additional related studies:
 - [Rocque et al. (2021), *Front. Immunol.*](https://doi.org/10.3389/fimmu.2021.679521) - integrated published studies to create a "RNASeq Meta-Atlas"

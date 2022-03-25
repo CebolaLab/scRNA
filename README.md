@@ -77,7 +77,9 @@ These are summarised in Figure 10 from [MacParland et al. (2018)](https://www.na
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/MacParland_liver_schematic.png" width="800">
 
-The published scRNA-seq studies of the liver have uncovered many novel cell types and states in both healthy and diseased human liver. For example, [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) reported two distinct populations of liver macrophages, one pro-inflammatory and one immunoregulatory. A year later and with a larger sample size, [Aizarani et al. (2019)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) reported novel cellular sub-types and zonated profiles of endothelial cells, Kupffer cells and hepatocytes, and heterogeneity of EPCAM+ hepatocyte-biased and cholangiocyte cells, as well as a population of progenitor cells with "strong potential to form bipotent liver organoids".
+The published scRNA-seq studies of the liver have uncovered many novel cell types and states in both healthy and diseased human liver. For example, [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) reported **two distinct populations of Kupffer cells (liver macrophages), one pro-inflammatory and one immunoregulatory**. A year later and with a larger sample size, [Aizarani et al. (2019)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) reported novel cellular sub-types and zonated profiles of endothelial cells, Kupffer cells and hepatocytes, and heterogeneity of EPCAM+ hepatocyte-biased and cholangiocyte cells, as well as a population of progenitor cells with "strong potential to form bipotent liver organoids".
+
+Briefly, studies in mice have also uncovered interesting mechanisms, including zone-Specific alterations of LSECs in cirrhotic mouse liver [(Su et al. 2021)](https://www.sciencedirect.com/science/article/pii/S2352345X2030206X).
 
 ### Alignment, demultiplexing and quantification
 

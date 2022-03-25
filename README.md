@@ -38,7 +38,7 @@ The studies listed below are published scRNA-seq studies of *human* liver:
 
 ### Hepatic cell types
 
-These scRNA-seq studies of the liver have uncovered many novel cell types and states in both healthy and diseased human liver. Briefly, the cell types found in human liver include:
+Briefly, the cell types found in human liver include:
 
 Parenchymal cells:
 - **Hepatocytes**
@@ -56,13 +56,13 @@ Bloodborne cells:
 - B cells 
 - Plasma cells 
 
-These are summarised in this Figure from [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7):  
+Importantly, all of these cell types may be further sub-divided depending on their location, or "zonation" in the liver, with distinct cell differences between periportal and central venous regions.  
+  
+These are summarised in Figure 10 from [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7):  
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/MacParland_liver_schematic.png" width="800">
 
-For example, [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) reported two distinct populations of liver macrophages, 
-
-[MacParland et al. (2018)]
+The published scRNA-seq studies of the liver have uncovered many novel cell types and states in both healthy and diseased human liver. For example, [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) reported two distinct populations of liver macrophages, one pro-inflammatory and one immunoregulatory. 
 
 
 ### Alignment, demultiplexing and quantification

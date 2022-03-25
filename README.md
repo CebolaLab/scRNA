@@ -1,4 +1,4 @@
-# Analysis of 10X Genomics scRNA-seq data
+# Analysis of Liver scRNA-seq (10X genomics)
 This Github describes the pipeline used by the Cebola Lab to analyse single-cell RNA-seq data (scRNA-seq) from 10X Genomics. 
 
 ## Table of contents
@@ -20,9 +20,22 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 5. **DoubletFinder**: identify and remove droplets with doublets i.e. two (or more) cells using `doubletFinder`. 
 6. **Final clustering**: the cleaned data is processed for a final time and clusters are labelled using known marker genes. (Supervised and/or unsupervised clustering may be carried out). 
 
+This pipeline has been developed by carefully reviewing current tools and best practises used in the analysis of 10X Genomics scRNA-seq data, as of March 2022. This Github will first present an overview of various available tools, followed by the Cebola Lab pipeline. Resources used are shown in the [References](#references) at the bottom of this page.
+
 ## 2. Background
 
-This pipeline has been developed by carefully reviewing current tools and best practises used in the analysis of 10X Genomics scRNA-seq data, as of March 2022. This Github will first present an overview of various available tools, followed by the Cebola Lab pipeline. Resources used are shown in the [References](#references) at the bottom of this page.
+The background section will be split into (1) a summary of previous scRNA-seq studies of the liver, (2) a discussion of liver cell types and (3) background on the methods used to analyse scRNA-seq data.
+
+### Published Liver scRNA-seq studies
+
+The studies listed below are published scRNA-seq studies of *human* liver:
+
+- [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) - the first scRNA-seq atlas of human liver, published in *Nature Communications*.
+- [Aizarani et al. (2019)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) - Nine human donors, healthy livers (~10,000 cells). Published in *Nature*.
+- [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3) - scRNA-seq of both healthy and cirrhotic liver, including NAFLD, published in *Nature*.
+- [Wang et al. (2021)](https://www.nature.com/articles/s41598-021-98806-y)
+- [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) 
+
 
 ### Alignment, demultiplexing and quantification
 
@@ -531,7 +544,6 @@ DoHeatmap(object = SAMN12614700.filtered, features = unique(LSEC.markers[,1]))
 We can see that cluster 3 stands out significantly as LSECs!  
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_heatmap.png" height="700">
-
 
 Using this information we can relabel the clusters:
 

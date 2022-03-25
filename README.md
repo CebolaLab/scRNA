@@ -56,6 +56,10 @@ Bloodborne cells:
 - B cells 
 - Plasma cells 
 
+These are summarised in this Figure from [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7):  
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/MacParland_liver_schematic.png" width="800">
+
 For example, [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) reported two distinct populations of liver macrophages, 
 
 [MacParland et al. (2018)]

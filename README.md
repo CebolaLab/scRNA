@@ -30,9 +30,9 @@ The background section will be split into (1) a summary of previous scRNA-seq st
 
 The studies listed below are published scRNA-seq studies of *human* liver:
 
-- [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) - the first scRNA-seq atlas of human liver, published in *Nature Communications*.
-- [Aizarani et al. (2019)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) - Nine human donors, healthy livers (~10,000 cells). Published in *Nature*.
-- [Ramachandran et al. (2019)](https://www.nature.com/articles/s41586-019-1631-3) - scRNA-seq of both healthy and cirrhotic liver, including NAFLD, published in *Nature*.
+- [MacParland et al. (2018), *Nature Communications*.](https://www.nature.com/articles/s41467-018-06318-7) - the first scRNA-seq atlas of human liver.
+- [Aizarani et al. (2019), *Nature*.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) - Nine human donors, healthy livers (~10,000 cells).
+- [Ramachandran et al. (2019), *Nature*.](https://www.nature.com/articles/s41586-019-1631-3) - scRNA-seq of both healthy and cirrhotic liver, including NAFLD.
 - [Wang et al. (2021)](https://www.nature.com/articles/s41598-021-98806-y)
 - [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) 
 

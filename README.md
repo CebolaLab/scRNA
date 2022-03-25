@@ -4,7 +4,10 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 ## Table of contents
 
 1. [Pipeline overview](#1-Pipeline-overview)  
-2. [Background](#2-Background): including [Published liver scRNA-seq studies](#Published-Liver-scRNA-seq-studies), [Hepatic cell types](#Hepatic-cell-types) and [Methods for the analysis of scRNA-seq data](#Methods-for-the-analysis-of-scRNA-seq-data)
+2. [Background](#2-Background): 
+    - [Published liver scRNA-seq studies](#Published-Liver-scRNA-seq-studies)
+    - [Hepatic cell types](#Hepatic-cell-types) 
+    - [Methods for the analysis of scRNA-seq data](#Methods-for-the-analysis-of-scRNA-seq-data)
 3. [Workspace setup](#3-Workspace-setup)
 4. [Generate a reference transcriptome](#2-Generate-a-reference-transcriptome)
 5. [Cellranger count](#5-Cellranger-count)

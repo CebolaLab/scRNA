@@ -36,9 +36,20 @@ The studies listed below are published scRNA-seq studies of *human* liver:
 - [Payen et al. (2021)](https://www.jhep-reports.eu/article/S2589-5559(21)00054-9/fulltext) - >25,000 human liver cells
 - [Wang et al. (2021), *Scientific Reports*](https://www.nature.com/articles/s41598-021-98806-y) - 17,810 non-parenchymal cells from six healthy human livers. Integrated with public bulk/scRNA-seq of NASH livers.
 
+- [Zhang et al. (2020), *Front. Oncol.*](https://www.frontiersin.org/articles/10.3389/fonc.2020.596318/full) - scRNA of HCC livers with cirrhosis
+
 Additional related studies:
-- [Rocque et al. (2021), *Front. Immunol.*](https://doi.org/10.3389/fimmu.2021.679521) - integrate published studies to create a "RNASeq Meta-Atlas"
+- [Rocque et al. (2021), *Front. Immunol.*](https://doi.org/10.3389/fimmu.2021.679521) - integrated published studies to create a "RNASeq Meta-Atlas"
 - [Brancale and Vilarinho]() not sure?
+
+Reviews on the topic include: 
+
+- [Xiong et al. (2020), *Hepatology*](10.1002/hep.31149) "A single-cell perspective of the mammalian liver in health and disease"
+- [Stamataki and Swadling (2020)](https://onlinelibrary.wiley.com/doi/full/10.1111/imm.13193)
+- [Ramachandran et al. (2020), *Nature*](https://www.nature.com/articles/s41575-020-0304-x) "Single-cell technologies in hepatology: new insights into liver biology and disease pathogenesis"
+- [Saviano et al. (2020)](https://www.sciencedirect.com/science/article/pii/S016882782030372X) "Single-cell genomics and spatial transcriptomics: Discovery of novel cell states and cellular interactions in liver physiology and disease biology"
+- [He et al. (2021), *Ann Transl Med*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8576673/) "Application of single-cell RNA sequencing technology in liver diseases: a narrative review"
+
 
 ### Hepatic cell types
 

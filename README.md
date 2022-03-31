@@ -27,32 +27,7 @@ This pipeline has been developed by carefully reviewing current tools and best p
 
 ## 2. Background
 
-The background section will be split into (1) a summary of previous scRNA-seq studies of the liver, (2) a discussion of liver cell types and (3) background on the methods used to analyse scRNA-seq data.
-
-### Published Liver scRNA-seq studies
-
-The studies listed below are published scRNA-seq studies of *human* liver:
-
-- [MacParland et al. (2018), *Nature Comms*.](https://www.nature.com/articles/s41467-018-06318-7) - the first scRNA-seq atlas of human liver (5 livers, 8,444 cells)
-- [Aizarani et al. (2019), *Nature*.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) - Nine human donors, healthy livers (~10,000 cells).
-- [Ramachandran et al. (2019), *Nature*.](https://www.nature.com/articles/s41586-019-1631-3) - scRNA-seq of both healthy and cirrhotic liver, including NAFLD.
-- [Zhang et al. (2020), *Front. Oncol.*](https://www.frontiersin.org/articles/10.3389/fonc.2020.596318/full) - scRNA of HCC livers with cirrhosis
-- [Payen et al. (2021)](https://www.jhep-reports.eu/article/S2589-5559(21)00054-9/fulltext) - >25,000 human liver cells
-- [Wang et al. (2021), *Scientific Reports*](https://www.nature.com/articles/s41598-021-98806-y) - 17,810 non-parenchymal cells from six healthy human livers. Integrated with public bulk/scRNA-seq of NASH livers.
-
-
-Additional related studies:
-- [Rocque et al. (2021), *Front. Immunol.*](https://doi.org/10.3389/fimmu.2021.679521) - integrated published studies to create a "RNASeq Meta-Atlas"
-- [Brancale and Vilarinho]() not sure?
-
-Reviews on the topic include: 
-
-- [Xiong et al. (2020), *Hepatology*](10.1002/hep.31149) "A single-cell perspective of the mammalian liver in health and disease"
-- [Stamataki and Swadling (2020)](https://onlinelibrary.wiley.com/doi/full/10.1111/imm.13193)
-- [Ramachandran et al. (2020), *Nature*](https://www.nature.com/articles/s41575-020-0304-x) "Single-cell technologies in hepatology: new insights into liver biology and disease pathogenesis"
-- [Saviano et al. (2020)](https://www.sciencedirect.com/science/article/pii/S016882782030372X) "Single-cell genomics and spatial transcriptomics: Discovery of novel cell states and cellular interactions in liver physiology and disease biology"
-- [He et al. (2021), *Ann Transl Med*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8576673/) "Application of single-cell RNA sequencing technology in liver diseases: a narrative review"
-
+The background section will be split into (1) liver cell-types, (2) a summary of previous scRNA-seq studies of the liver and (3) background on the methods used to analyse scRNA-seq data.
 
 ### Hepatic cell types
 
@@ -75,15 +50,36 @@ Bloodborne cells:
 - B cells 
 - Plasma cells 
 
-The cells have important functions which contribute to the hepatic niche.
-
-Importantly, all of these cell types may be further sub-divided depending on their location, or "zonation" in the liver, with distinct cell differences between periportal and central venous regions.  
+The cells have important functions which contribute to the hepatic niche. Importantly, all of these cell types may be further sub-divided depending on their location, or "zonation" in the liver, with distinct cell differences between periportal and central venous regions.  
   
 These are summarised in Figure 10 from [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7):  
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/MacParland_liver_schematic.png" width="800">
 
-The published scRNA-seq studies of the liver have uncovered many novel cell types and states in both healthy and diseased human liver. For example, [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) reported **two distinct populations of Kupffer cells (liver macrophages), one pro-inflammatory and one immunoregulatory**. A year later and with a larger sample size, [Aizarani et al. (2019)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) reported novel cellular sub-types and zonated profiles of endothelial cells, Kupffer cells and hepatocytes, and heterogeneity of EPCAM+ hepatocyte-biased and cholangiocyte cells, as well as a population of progenitor cells with "strong potential to form bipotent liver organoids".
+### Published Liver scRNA-seq studies
+
+The studies listed below are published scRNA-seq studies of *human* liver:
+
+- [MacParland et al. (2018), *Nature Comms*.](https://www.nature.com/articles/s41467-018-06318-7) - the first scRNA-seq atlas of human liver (5 livers, 8,444 cells)
+- [Aizarani et al. (2019), *Nature*.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) - Nine human donors, healthy livers (~10,000 cells).
+- [Ramachandran et al. (2019), *Nature*.](https://www.nature.com/articles/s41586-019-1631-3) - scRNA-seq of both healthy and cirrhotic liver, including NAFLD.
+- [Zhang et al. (2020), *Front. Oncol.*](https://www.frontiersin.org/articles/10.3389/fonc.2020.596318/full) - scRNA of HCC livers with cirrhosis
+- [Payen et al. (2021)](https://www.jhep-reports.eu/article/S2589-5559(21)00054-9/fulltext) - >25,000 human liver cells
+- [Wang et al. (2021), *Scientific Reports*](https://www.nature.com/articles/s41598-021-98806-y) - 17,810 non-parenchymal cells from six healthy human livers. Integrated with public bulk/scRNA-seq of NASH livers.
+
+Additional related studies:
+- [Rocque et al. (2021), *Front. Immunol.*](https://doi.org/10.3389/fimmu.2021.679521) - integrated published studies to create a "RNASeq Meta-Atlas"
+- [Brancale and Vilarinho]() not sure?
+
+Reviews on the topic include: 
+
+- [Xiong et al. (2020), *Hepatology*](10.1002/hep.31149) "A single-cell perspective of the mammalian liver in health and disease"
+- [Stamataki and Swadling (2020)](https://onlinelibrary.wiley.com/doi/full/10.1111/imm.13193)
+- [Ramachandran et al. (2020), *Nature*](https://www.nature.com/articles/s41575-020-0304-x) "Single-cell technologies in hepatology: new insights into liver biology and disease pathogenesis"
+- [Saviano et al. (2020)](https://www.sciencedirect.com/science/article/pii/S016882782030372X) "Single-cell genomics and spatial transcriptomics: Discovery of novel cell states and cellular interactions in liver physiology and disease biology"
+- [He et al. (2021), *Ann Transl Med*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8576673/) "Application of single-cell RNA sequencing technology in liver diseases: a narrative review"
+
+The published scRNA-seq studies of the liver have uncovered many novel cell types and states in both healthy and diseased human liver. For example, [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7) reported **two distinct populations of Kupffer cells (liver macrophages), one pro-inflammatory and one immunoregulatory**. A year later and with a larger sample size, [Aizarani et al. (2019)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/) reported novel cellular sub-types and zonated profiles of endothelial cells, Kupffer cells and hepatocytes, and heterogeneity of EPCAM+ hepatocyte-biased and cholangiocyte cells, as well as a population of progenitor cells with "strong potential to form bipotent liver organoids". 
 
 Briefly, studies in mice have also uncovered interesting mechanisms, including zone-Specific alterations of LSECs in cirrhotic mouse liver [(Su et al. 2021)](https://www.sciencedirect.com/science/article/pii/S2352345X2030206X).
 

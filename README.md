@@ -62,17 +62,20 @@ Parenchymal cells:
 - **Hepatocytes**
 
 Non-parenchymal cells (NPCs):
-- **Endothelial cells (sinusoidal)**: liver sinusoidal endothelial cells, or 'LSECs'
+- **Endothelial cells (sinusoidal)**: liver sinusoidal endothelial cells, or 'LSECs'. Highly permeable and specialised.
 - **Endothelial cells (vascular)**
 - **Endothelial cells (arterial)**
 - **Cholangiocytes**: epithelial cells which line the bile ducts
 - **Kupffer cells**: liver resident macrophages
+- **Stellate cells**: secrete vitamin A and collagen in healthy and unhealthy livers, respectively
 
 Bloodborne cells:
 - T-cells
 - NK-like cells
 - B cells 
 - Plasma cells 
+
+The cells have important functions which contribute to the hepatic niche.
 
 Importantly, all of these cell types may be further sub-divided depending on their location, or "zonation" in the liver, with distinct cell differences between periportal and central venous regions.  
   
@@ -114,8 +117,7 @@ GEMs containing damaged cells can be identified using commonly-used metrics: **(
 
 > **Doublets**   
 
-Doublets have been removed in the past by simply removing cells with particularly high gene counts (e.g. with significant deviation). However, this can remove active cell types with high levels of gene expression. In addition, hepatocytes and other liver cells types can be bi-nucleated, leading to single-cell droplets with increased counts. More sophisticated methods typically identify doublets based on their similarity with simulated doublets. Currently available tools include: doubletCells (Lun et al., 2016), Scrublet [(Wolock et al., 2019)](https://www.sciencedirect.com/science/article/pii/S2405471220301952#bib32), cxds (Bais and Kostka, 2020), bcds (Bais and Kostka, 2020), hybrid (Bais and Kostka, 2020), Solo [(Bernstein et al. 2020)](https://doi.org/10.1016/j.cels.2020.05.010), DoubletDetection (Gayoso and Shor, 2018), DoubletFinder ([McGinnis et al., 2019a](https://www.sciencedirect.com/science/article/pii/S2405471220304592#bib44), [2019b](https://www.sciencedirect.com/science/article/pii/S2405471220304592#bib45)), and DoubletDecon (DePasquale et al., 2019). These methods were recently compared by [Xi and Li (2021)](https://www.sciencedirect.com/science/article/pii/S2405471220304592), who report **DoubletFinder** and **Solo** as the top two performing methods. Briefly, **DoubletFinder** uses a *k*-nearest neighbors (kNN) algorithm to identify doublets based on their clustering with simulated doublets in principal component space. **Solo** (included in the scvi-tools suite from the Yosef Lab at UC Berkeley) uses a semi-supervised deep learning approach and claims improvements over DoubletFinder by not assuming linear gene expression circuits (note [Xi and Li (2021)](https://www.sciencedirect.com/science/article/pii/S2405471220304592) reported DoubletFinder as the top method).
-
+Doublets have been removed in the past by simply removing cells with particularly high gene counts (e.g. with significant deviation). However, this can remove active cell types with high levels of gene expression. In addition, hepatocytes and other liver cells types can be bi-nucleated, leading to single-cell droplets with increased counts. More sophisticated methods typically identify doublets based on their similarity with simulated doublets. Currently available tools include: doubletCells (Lun et al., 2016), Scrublet [(Wolock et al., 2019)](https://www.sciencedirect.com/science/article/pii/S2405471220301952#bib32), cxds (Bais and Kostka, 2020), bcds (Bais and Kostka, 2020), hybrid (Bais and Kostka, 2020), Solo [(Bernstein et al. 2020)](https://doi.org/10.1016/j.cels.2020.05.010), DoubletDetection (Gayoso and Shor, 2018), DoubletFinder ([McGinnis et al., 2019a](https://www.sciencedirect.com/science/article/pii/S2405471220304592#bib44), [2019b](https://www.sciencedirect.com/science/article/pii/S2405471220304592#bib45)), and DoubletDecon (DePasquale et al., 2019). These methods were recently compared by [Xi and Li (2021)](https://www.sciencedirect.com/science/article/pii/S2405471220304592), who report **DoubletFinder** and **Solo** as the top two performing methods. Briefly, **DoubletFinder** uses a *k*-nearest neighbors (kNN) algorithm to identify doublets based on their clustering with simulated doublets in principal component space. **Solo** (included in the scvi-tools suite from the Yosef Lab at UC Berkeley) uses a semi-supervised deep learning approach and claims improvements over DoubletFinder by not assuming linear gene expression circuits (note [Xi and Li (2021)](https://www.sciencedirect.com/science/article/pii/S2405471220304592) reported DoubletFinder as the top method). ([DEIM](https://www.nature.com/articles/s41598-020-67513-5) may be useful for single-nuclei experiments).
 
 #### Downstream analysis
 
@@ -124,9 +126,14 @@ Doublets have been removed in the past by simply removing cells with particularl
 Including *clustering and cell identity*
 *TBC*
 
+Batch effect correction: methods include [ComBat-seq](https://academic.oup.com/nargab/article/2/3/lqaa078/5909519)
+Batch correction using [Harmony](https://portals.broadinstitute.org/harmony/articles/quickstart.html), BBKNN, and Seurat v3 with processed data and highly variable genes. Harmony better than Seurat v3 according to [https://www.nature.com/articles/s41597-021-00809-x#Sec2]
+
+Integrate datasets which have been normalised using SCTransform [vignette](https://satijalab.org/seurat/archive/v3.1/integration.html#sctransform),
+
 #### Dataset integration
 
-*TBC*
+Here, we opt to process biological replicates independently and then integrate them using the [recommended Seurat pipeline](https://satijalab.org/seurat/articles/integration_introduction.html) on integrating datasets. Specifically, we follow steps to integrate datasets normalized with SCTransform (`PrepSCTIntegration()` > `FindIntegrationAnchors()` > `IntegrateData()`, with the normalization.method parameter to the value SCT).
 
 #### Differential expression and pseudobulk expression  
 *TBC*
@@ -235,16 +242,8 @@ SAMN12614700.data=Read10X("SAMN12614700_male_healthy/SAMN12614700/outs/filtered_
 SAMN12614700 <- CreateSeuratObject(counts = SAMN12614700.data, project = "SAMN12614700", 
                                           min.cells = 1, min.features = 1)
 
-#If technical replicates are being merged at this stage instead, the following code can be used:
-#Technical replicate 1
-#rep1.data=Read10X("SAMN12614700_male_healthy/SRR10009414_control/outs/filtered_feature_bc_matrix/")
-#rep1 <- CreateSeuratObject(counts = SRR10009414.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
-#Technical replicate 2
-#rep2.data=Read10X("SAMN12614700_male_healthy/SRR10009415_control/outs/filtered_feature_bc_matrix/")
-#rep2 <- CreateSeuratObject(counts = SRR10009415.data, project = "SAMN12614700", min.cells = 1, min.features = 1)
-#To combine technical replicates:
-#merged <- merge(rep1, y = rep2,add.cell.ids = c("rep1", "rep2"),project = "SAMN12614700")
-
+#If technical replicates are being merged at this stage instead, the following code can be used to merge Seurat objects:
+#merged <- merge(rep1, y = rep2, add.cell.ids = c("rep1", "rep2"),project = "SAMN12614700")
 ```
 
 The output shows that there is `26276 features across 5560 samples within 1 assay`, meaning 26,276 expressed genes and 5,560 cells. 
@@ -523,6 +522,8 @@ Next, the clusters will be identified as specific cell-types based on curated ma
 - [Payen et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2589555921000549#sec2) "The expression of different combinations of genes was used to define scores and signatures using the Seurat PercentageFeatureSet function".
 - [Aizarani et al. (2019)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/). cells from select clusters were reanalyzed with [RaceID3](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R4) (see paper for parameters). [StemID](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6687507/#R24) was run on resulting, filtered and feature-selected expression matrix, with target clusters "inferred by FateID using ASGR1 plus ALB and CXCL8 plus MMP7 as markers for hepatocyte and cholangiocyte lineage target clusters. Using the KRT19 and CFTR as mature cholangiocyte markers yields highly similar results."
 
+Marker genes: "tissue-resident KCs can be distinguished from monocyte-derived marcophages by expression of MARCO, CD163,FCGR3A and CD5L, and the absense of LSP1 and CD48". (biorXiv cambridge paper on liver development).
+
 Here, we will calculate a cell-type score based on curated marker gene sets obtained by integrating marker genes from PanglaoDB and in-house curated gene sets. The curated gene set lists are available as a file in this Github (xxxxxx), with the pipeline used to generate this file described below:
 
 ```sh
@@ -613,10 +614,13 @@ DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLe
 
 Also calculated each cell lineage, calculated Pearson correlation across replicates).
 
-# References
+# References and resources
 
 - [Leucken and Theis (2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746): A 2019 effort to compile current best practises in scRNA-seq. This paper is very useful for "newbies" and gives an excellent overview of the essential steps of scRNA-seq analysis (note that some specific tools mentioned are superceeded by more recent published tools).
 - https://hbctraining.github.io/scRNA-seq/lessons/04_SC_quality_control.html
+- [svci-tools User Guide](https://docs.scvi-tools.org/en/stable/user_guide/index.html)
+- [SoupX vignette](https://rawcdn.githack.com/constantAmateur/SoupX/204b602418df12e9fdb4b68775a8b486c6504fe4/inst/doc/pbmcTutorial.html)
+- Wellcome single-cell course [using Seurat](https://www.singlecellcourse.org/single-cell-rna-seq-analysis-using-seurat.html)
 
 e.g. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) use `DoubletFinder` and then `decontX` of `celda` to correct for "cross containment".
 3. **CellRanger**: cellranger also provides it's own tools for secondary analysis, the "`cellranger reanalyze` command reruns secondary analysis performed on the feature-barcode matrix (dimensionality reduction, clustering and visualization) using different parameter settings."

@@ -5,8 +5,8 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 
 1. [Pipeline overview](#1-Pipeline-overview)  
 2. [Background](#2-Background): 
+    - [Hepatic cell types](#Hepatic-cell-types) and marker genes
     - [Published liver scRNA-seq studies](#Published-Liver-scRNA-seq-studies)
-    - [Hepatic cell types](#Hepatic-cell-types) 
     - [Methods for the analysis of scRNA-seq data](#Methods-for-the-analysis-of-scRNA-seq-data)
 3. [Workspace setup](#3-Workspace-setup)
 4. [Generate a reference transcriptome](#2-Generate-a-reference-transcriptome)
@@ -17,11 +17,13 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 ## 1. Pipeline overview
 
 1. **Generate count matrix**: `CellRanger count` is used to generate count matrices with some initial filtering to remove empty droplets. 
-2. **Pre-processing**: the count matrix is read into R using `Seurat`.  Initial pre-processing is carried out to prepare the data for the next steps, including normalization with a negative binominal model (`SCTransform`), merging of technical replicates and initial dimensionality reduction and clustering using `RunPCA`, `RunUMAP`, `FindNeighbors` and `FindClusters`.
+2. **Pre-processing**: each **biological replicate is processing seperately**. the count matrix is read into R using `Seurat`.  Initial pre-processing is carried out to prepare the data for the next steps, including normalization with a negative binominal model (`SCTransform`), merging of technical replicates and initial dimensionality reduction and clustering using `RunPCA`, `RunUMAP`, `FindNeighbors` and `FindClusters`.
 3. **Correct for ambient gene expression** `SoupX` is used to correct for ambient gene expression. 
 4. **QC filtering**: repeat the normalization and clustering with the corrected data. Identify and remove clusters of low-quality cells. Several rounds of pre-processing, clustering and filtering may be required.
 5. **DoubletFinder**: identify and remove droplets with doublets i.e. two (or more) cells using `doubletFinder`. 
 6. **Final clustering**: the cleaned data is processed for a final time and clusters are labelled using known marker genes. (Supervised and/or unsupervised clustering may be carried out). 
+7. **Integrate biological replicates**
+8. **Pseudo-bulk gene expression**
 
 This pipeline has been developed by carefully reviewing current tools and best practises used in the analysis of 10X Genomics scRNA-seq data, as of March 2022. This Github will first present an overview of various available tools, followed by the Cebola Lab pipeline. Resources used are shown in the [References](#references) at the bottom of this page.
 
@@ -55,6 +57,10 @@ The cells have important functions which contribute to the hepatic niche. Import
 These are summarised in Figure 10 from [MacParland et al. (2018)](https://www.nature.com/articles/s41467-018-06318-7):  
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/MacParland_liver_schematic.png" width="800">
+
+> Marker genes  
+
+Marker genes to distinguish each cell type are provided with this Github. The `xxxx` spreadsheet includes detailed information such as the sources and reported level of specificity. 
 
 ### Published Liver scRNA-seq studies
 

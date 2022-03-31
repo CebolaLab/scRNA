@@ -124,6 +124,8 @@ GEMs containing damaged cells can be identified using commonly-used metrics: **(
 
 Doublets have been removed in the past by simply removing cells with particularly high gene counts (e.g. with significant deviation). However, this can remove active cell types with high levels of gene expression. In addition, hepatocytes and other liver cells types can be bi-nucleated, leading to single-cell droplets with increased counts. More sophisticated methods typically identify doublets based on their similarity with simulated doublets. Currently available tools include: doubletCells (Lun et al., 2016), Scrublet [(Wolock et al., 2019)](https://www.sciencedirect.com/science/article/pii/S2405471220301952#bib32), cxds (Bais and Kostka, 2020), bcds (Bais and Kostka, 2020), hybrid (Bais and Kostka, 2020), Solo [(Bernstein et al. 2020)](https://doi.org/10.1016/j.cels.2020.05.010), DoubletDetection (Gayoso and Shor, 2018), DoubletFinder ([McGinnis et al., 2019a](https://www.sciencedirect.com/science/article/pii/S2405471220304592#bib44), [2019b](https://www.sciencedirect.com/science/article/pii/S2405471220304592#bib45)), and DoubletDecon (DePasquale et al., 2019). These methods were recently compared by [Xi and Li (2021)](https://www.sciencedirect.com/science/article/pii/S2405471220304592), who report **DoubletFinder** and **Solo** as the top two performing methods. Briefly, **DoubletFinder** uses a *k*-nearest neighbors (kNN) algorithm to identify doublets based on their clustering with simulated doublets in principal component space. **Solo** (included in the scvi-tools suite from the Yosef Lab at UC Berkeley) uses a semi-supervised deep learning approach and claims improvements over DoubletFinder by not assuming linear gene expression circuits (note [Xi and Li (2021)](https://www.sciencedirect.com/science/article/pii/S2405471220304592) reported DoubletFinder as the top method). ([DEIM](https://www.nature.com/articles/s41598-020-67513-5) may be useful for single-nuclei experiments).
 
+See more information in the [OSCA vignette](http://bioconductor.org/books/3.13/OSCA.advanced/doublet-detection.html). "This site contains the advanced analysis chapters for the “Orchestrating Single-Cell Analysis with Bioconductor” book." (2021-05)
+
 #### Downstream analysis
 
 > **Feature selection, dimensionality reduction and visualisation**    
@@ -630,7 +632,7 @@ Look back at the tutorial to "follow the previous steps in this vignette to iden
 
 Note the strength of integration can be increased by increasing the `k.anchor` parameter, in the `FindIntegrationAnchors` command.
 
-An alternative workflow for large datasets employs [reference-based integration](https://satijalab.org/seurat/articles/integration_large_datasets.html). Here, one (or two, if you wish for one male and one female) dataset is used as reference to reduce the number of comparisons, rather than identifying anchors between al pairs of query datasets. This involves using the `reference` option (e.g. `reference = c(1, 2)` in the `FindIntegrationAnchors` command.
+An alternative workflow for **large datasets** employs [reference-based integration](https://satijalab.org/seurat/articles/integration_large_datasets.html). Here, one (or two, if you wish for one male and one female) dataset is used as reference to reduce the number of comparisons, rather than identifying anchors between al pairs of query datasets. This involves using the `reference` option (e.g. `reference = c(1, 2)` in the `FindIntegrationAnchors` command.
 
 - Create a list of Seurat objects to integrate
 - Perform normalization, feature selection, and scaling separately for each dataset
@@ -644,6 +646,7 @@ An alternative workflow for large datasets employs [reference-based integration]
 - [svci-tools User Guide](https://docs.scvi-tools.org/en/stable/user_guide/index.html)
 - [SoupX vignette](https://rawcdn.githack.com/constantAmateur/SoupX/204b602418df12e9fdb4b68775a8b486c6504fe4/inst/doc/pbmcTutorial.html)
 - Wellcome single-cell course [using Seurat](https://www.singlecellcourse.org/single-cell-rna-seq-analysis-using-seurat.html)
+- [Advanced chapters from the “Orchestrating Single-Cell Analysis with Bioconductor” book](http://bioconductor.org/books/3.13/OSCA.advanced/)
 
 e.g. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?login=false#supplementary-data) use `DoubletFinder` and then `decontX` of `celda` to correct for "cross containment".
 3. **CellRanger**: cellranger also provides it's own tools for secondary analysis, the "`cellranger reanalyze` command reruns secondary analysis performed on the feature-barcode matrix (dimensionality reduction, clustering and visualization) using different parameter settings."
@@ -673,6 +676,8 @@ For single-nuclei RNA, [Hardwick et al. (2022)](https://www.nature.com/articles/
 Here, the data is filtered for informative genes, such as *highly variable genes* (HVGs), usually between 1,000 and 5,000. Tools for selecting HVGs are provided by Seurat and Scanpy, which bin genes by their mean expression and select genes with the highest variance-to-mean ratio. Make sure to check what type of data your method expects (e.g. raw count data or log-transformated data). For your final analysis, HVGs should be selected *after* normalization and pre-processing. (Note some tools select HVGs as part of the pre-processing step; these are not the same as your final list of HVGs which give your clusters).
 
 For dimensionaly reduction, UMAP is reported to be the optimal method over several other popular alternatives (e.g. t-SNE, PCA and MDS) [(Yang et al. 2021)](https://www.sciencedirect.com/science/article/pii/S2211124721008597)
+
+Try out the [densMAP](http://bioconductor.org/books/3.13/OSCA.advanced/dimensionality-reduction-redux.html) algorithm from [Narayan et al. (2021)](http://bioconductor.org/books/3.13/OSCA.advanced/dimensionality-reduction-redux.html#ref-narayan2021densvis) which improves within-cluster resolution by "incorporating information about the average distance to the nearest neighbours when creating the embedding" (example pipeline [here](http://bioconductor.org/books/3.13/OSCA.advanced/dimensionality-reduction-redux.html)).
 
 > Dimensionality reduction  
 **Clustering**. In the 2019 review by Leuken and Theis, the most popular method for clustering was **multi-resolution modularity optimization** algorithm as implemented in the Louvian algorithm. This algorithm detects groups of cells that have "more links between them than expected from the number of links the cells have in total". (Implemented by Seurat and Scanpy). 

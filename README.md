@@ -105,6 +105,9 @@ The pipeline for secondary analysis, including references, is discussed below.
 
 Within-sample normalization aims to normalise counts across cells which can differ due to sequencing depth, RNA content, and efficiency of lysis and reverse transcription [(Saket Choudhary & Rahul Satija, 2022; ](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02584-9)[Grün, Kester and van Oudenaarden. 2014)](http://scholar.google.com/scholar_lookup?&title=Validation%20of%20noise%20models%20for%20single-cell%20transcriptomics&journal=Nat%20Methods&volume=11&issue=6&pages=637-40&publication_year=2014&author=Grün%2CD&author=Kester%2CL&author=van%20Oudenaarden%2CA). Some methods normalize based on the total expression detected per-cell, however this approach is more appropriate for bulk RNA-seq as it assumes that each cell started with the same number of RNA molecules (e.g **Seurat** `NormalizeData` which normalizes by the total expression, multiplied by a scale factor and log-transformed). More recent methods apply downsampling or statistical models. Tools include Linnorm [(Yip et al., 2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7019105/#B42), SCnorm [(Bacher et al., 2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7019105/#B3), scran [(Lun et al., 2016)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7019105/#B25), and more recently, Normalisr [(Wang, 2021)](https://www.nature.com/articles/s41467-021-26682-1), sctransform [(Hafemeister and Satija, 2019)](https://doi.org/10.1186%2Fs13059-019-1874-1), bayNorm [(Tang et al. 2020)](https://www.nature.com/articles/s41467-021-26682-1#ref-CR15), and Sanity [(Breda et al. 2019, *preprint*)](https://www.biorxiv.org/content/10.1101/2019.12.28.889956v1). Other normalization may be considered depending on the specific study design. For example, normalising for biological covariates (such as cell cycle stage) may be useful for trajectory inference. See discussion in [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).
 
+See the SCTranform [paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1874-1) and [vignette](https://satijalab.org/seurat/articles/sctransform_vignette.html). 
+
+
 Others?? *tbc* **Variance stabilization**. The aim here is to correct for the relationship between gene expression and variation in expression (a well-known effect which is corrected for in bulk RNA-seq pipelines, for example by DESeq2. Between-sample normalization, imputation
 
 > **Empty droplets and ambient gene expression**  
@@ -616,6 +619,21 @@ DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLe
 
 Also calculated each cell lineage, calculated Pearson correlation across replicates).
 
+Following this [Seurat tutorial](https://satijalab.org/seurat/articles/integration_introduction.html), we will integrate biological replicates which have been processed and normalised using [SCTranform](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1874-1) with Seurat `SelectIntegrationFeatures` > `PrepSCTIntegration()` > `FindIntegrationAnchors()` > `IntegrateData()` (use the `normalization.method = "SCT"` option with FindIntegrationAnchors and IntegrateData).
+
+`FindConservedMarkers()` function?
+Then `RunPCA` and `RunUMAP` with `reduction = "pca"`
+Look back at the tutorial to "follow the previous steps in this vignette to identify cell types and cell type-specific responses."
+
+Note the strength of integration can be increased by increasing the `k.anchor` parameter, in the `FindIntegrationAnchors` command.
+
+An alternative workflow for large datasets employs [reference-based integration](https://satijalab.org/seurat/articles/integration_large_datasets.html). Here, one (or two, if you wish for one male and one female) dataset is used as reference to reduce the number of comparisons, rather than identifying anchors between al pairs of query datasets. This involves using the `reference` option (e.g. `reference = c(1, 2)` in the `FindIntegrationAnchors` command.
+
+- Create a list of Seurat objects to integrate
+- Perform normalization, feature selection, and scaling separately for each dataset
+- Run PCA on each object in the list
+- Integrate datasets, and proceed with joint analysis
+
 # References and resources
 
 - [Leucken and Theis (2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746): A 2019 effort to compile current best practises in scRNA-seq. This paper is very useful for "newbies" and gives an excellent overview of the essential steps of scRNA-seq analysis (note that some specific tools mentioned are superceeded by more recent published tools).
@@ -639,7 +657,6 @@ e.g. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?lo
 Note...sctransform was used by the Satija lab in their 2022 [publication](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02584-9#Sec8)
 
 "In particular, two recent studies proposed to use generalized linear models (GLMs), where cellular sequencing depth was included as a covariate, as part of scRNA-seq preprocessing workflows. Our sctransform [9] approach utilizes the Pearson residuals from negative binomial regression as input to standard dimensional reduction techniques, while GLM-PCA [10] focuses on a generalized version of principal component analysis (PCA) for data with Poisson-distributed errors. More broadly, multiple techniques aim to learn a latent state that captures biologically relevant cellular heterogeneity using either matrix factorization or neural networks [11–13], alongside a defined error model that describes the variation that is not captured by the latent space.
-
 
 
 - [(Brüning et al. 2022)](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giac001/6515741) filter cells using the R packages DropletUtils and then use `Seurat` for downstream analysis, retaining cells with gene counts \>200 and \<2,500 and a mitochondrial content \<10%.

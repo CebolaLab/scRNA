@@ -617,11 +617,12 @@ DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLe
 
 ## Integrating biological replicates
 
-Also calculated each cell lineage, calculated Pearson correlation across replicates).
+Up to here, biological replicates have been processed independently. This provides an opportunity to assess replicate similarity including by calculating Pearson correlation for cell-type clusters across replicates.
 
-Following this [Seurat tutorial](https://satijalab.org/seurat/articles/integration_introduction.html), we will integrate biological replicates which have been processed and normalised using [SCTranform](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1874-1) with Seurat `SelectIntegrationFeatures` > `PrepSCTIntegration()` > `FindIntegrationAnchors()` > `IntegrateData()` (use the `normalization.method = "SCT"` option with FindIntegrationAnchors and IntegrateData).
+Following this [Seurat tutorial](https://satijalab.org/seurat/articles/integration_introduction.html), we will integrate biological replicates which have been processed and normalised using [SCTranform](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1874-1) with `SelectIntegrationFeatures` > `PrepSCTIntegration()` > `FindIntegrationAnchors()` > `IntegrateData()` (use the normalization.method = "SCT" option where appropriate).
 
-`FindConservedMarkers()` function?
+Note to self - look at the `FindConservedMarkers()` function. 
+
 Then `RunPCA` and `RunUMAP` with `reduction = "pca"`
 Look back at the tutorial to "follow the previous steps in this vignette to identify cell types and cell type-specific responses."
 

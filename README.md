@@ -626,27 +626,38 @@ DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLe
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/labelled_UMAP.png" height="500">
 
+Next, see the [donor integration tutorial]().
+
 ## 8. Donor integration
 
-Up to here, biological replicates have been processed independently. This provides an opportunity to assess replicate similarity including by calculating Pearson correlation for cell-type clusters across replicates.
+Up to now, biological replicates have been processed independently. This provides an opportunity to assess replicate similarity including by calculating Pearson correlation for cell-type clusters across replicates.
 
-Following this [Seurat tutorial](https://satijalab.org/seurat/articles/integration_introduction.html), we will [integrate biological replicates which have been processed and normalised using SCTranform](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1874-1) with `SelectIntegrationFeatures` > `PrepSCTIntegration()` > `FindIntegrationAnchors()` > `IntegrateData()` (use the normalization.method = "SCT" option where appropriate).
+Following this [Seurat tutorial](https://satijalab.org/seurat/articles/integration_introduction.html), we will [integrate biological replicates which have been processed and normalised using SCTranform](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1874-1) with `SelectIntegrationFeatures` > `PrepSCTIntegration()` > `FindIntegrationAnchors()` > `IntegrateData()` (use the normalization.method = "SCT" option where appropriate). See also the [Fast integration using reciprocal PCA (RPCA) vignette](https://satijalab.org/seurat/articles/integration_rpca.html). The steps will follow:
 
-See also the [Fast integration using reciprocal PCA (RPCA) vignette](https://satijalab.org/seurat/articles/integration_rpca.html).
+- Create a list of Seurat objects to integrate
+- Integrate data using `FindIntegrationAnchors`
+- Repeat dimensionality reduction (PCA/UMAP) and clustering 
 
-Note to self - look at the `FindConservedMarkers()` function. 
+```bash
+#Create a list with the Seurat objects for the donors
+liver.list=list(SAMN12614699.renamed,SAMN12614700.renamed,SAMN12614710.clusters,SAMN12614716.filtered,SAMN12614717.filtered)
 
-Then `RunPCA` and `RunUMAP` with `reduction = "pca"`
-Look back at the tutorial to "follow the previous steps in this vignette to identify cell types and cell type-specific responses."
+liver.features <- SelectIntegrationFeatures(object.list = liver.list, nfeatures = 3000) #3000
+#Prepare suerat object, ensures all appropriate residuals have been calculated
+liver.list <- PrepSCTIntegration(object.list = liver.list, anchor.features = liver.features, 
+    verbose = FALSE)
+
+#Find anchors
+liver.anchors <- FindIntegrationAnchors(object.list = liver.list, normalization.method = "SCT", 
+    anchor.features = liver.features, verbose = FALSE)
+#Intergate data
+liver.integrated <- IntegrateData(anchorset = liver.anchors, normalization.method = "SCT", 
+    verbose = FALSE)
+```
 
 Note the strength of integration can be increased by increasing the `k.anchor` parameter, in the `FindIntegrationAnchors` command.
 
-An alternative workflow for **large datasets** employs [reference-based integration](https://satijalab.org/seurat/articles/integration_large_datasets.html). Here, one (or two, if you wish for one male and one female) dataset is used as reference to reduce the number of comparisons, rather than identifying anchors between al pairs of query datasets. This involves using the `reference` option (e.g. `reference = c(1, 2)` in the `FindIntegrationAnchors` command.
-
-- Create a list of Seurat objects to integrate
-- Perform normalization, feature selection, and scaling separately for each dataset
-- Run PCA on each object in the list
-- Integrate datasets, and proceed with joint analysis
+An alternative workflow for **large datasets** employs [reference-based integration](https://satijalab.org/seurat/articles/integration_large_datasets.html). Here, one (or two, if you wish for one male and one female) dataset is used as reference to reduce the number of comparisons, rather than identifying anchors between al pairs of query datasets. This involves using the `reference` option (e.g. `reference = c(1, 2)` in the `FindIntegrationAnchors` command. 
 
 ## 9. Pseudobulk RNA counts
 
@@ -670,6 +681,7 @@ Here, we will generate bigwig files for each cell type. This will use `sinto` to
 4. Generate signal bigwigs
 
 **Split bam files by cluster**
+
 First, you will need the `cell_identity.txt` file created above. This will contain the cell barcode, appended with the sample number (added during the merging step), and the assigned cluster (cell type). It will will look something like:
 
 ```bash
@@ -682,9 +694,9 @@ AAATGCCCAGCATGAG-1_1	monocyte
 
 You will need to know the order in which the donors were merged, e.g:
 
-_1 = donor 1
-_2 = donor 2
-_3 = donor 3
+_1 = donor 1 \\
+_2 = donor 2 \\
+_3 = donor 3 \\
 
 Here, we assume that each donor has a diretory, such that the following two files are visible:
 
@@ -697,7 +709,7 @@ donor_3/outs/possorted_genome_bam.bam
 donor_3/outs/possorted_genome_bam.bam.bai
 ```
 
-Using `sinto`, the bam files for each donor will be split according to the cluster. An *array job* can be used to split the position sorted bam file for each donor:
+Using `sinto filterbarcodes`, the bam files for each donor will be split according to the cluster. An *array job* can be used to split the position sorted bam file for each donor:
 
 ```bash
 tid=$PBS_ARRAY_INDEX
@@ -710,6 +722,10 @@ grep "_${id[$tid]}" cell_identity.txt > cellIDs
 #cellIDs is a file which will only have the cellIDs with _1. We now need to remove _1 as this was added in the merging step and is missing from the cell IDs in the original bam file.
 sed -i "s/_${id[$tid]}//g" cellIDs 
 #Make sure to use the double quotes as this will allow for a variable within the command.
+
+
+sinto filterbarcodes -c cellIDs -b ${donors[$tid]}/outs/possorted_genome_bam.bam -p 6 --outdir ${donors[$tid]}
+#-p is the number of processors
 ```
 
 Next, we will use sinto 

@@ -9,7 +9,7 @@ An overview of the secondary analysis steps:
 3. [Correct for ambient gene expression using SoupX](#3-Correct-for-ambient-gene-expression-using-SoupX) (vignette available [here](https://rawcdn.githack.com/constantAmateur/SoupX/204b602418df12e9fdb4b68775a8b486c6504fe4/inst/doc/pbmcTutorial.html))
 4. [QC and removal of outlying clusters](#4-QC-and-removal-of-outlying-clusters)
 5. [Remove doublets with DoubletFinder](#5-Remove-doublets-with-DoubletFinder)
-6. Final round of processing and clustering 
+6. [Final round of processing and clustering](#6-Final-round-of-processing-and-clustering)
 
 A conda environment for the analysis can be created as follows:
 
@@ -290,12 +290,16 @@ We can see here that, of the new clusters, cluster 6 was made up of almost 75% d
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/doublets_clusters.png" height="400" >
 
-Remove doublets and repeat the clustering:
+Remove doublets:
 
 ```R
 #Remove the doublets, keeping only Singlets
 SAMN12614700.filtered=subset(x = SAMN12614700.filtered, subset = DF.classifications_0.25_0.09_90 == 'Singlet')
+```
 
+## 6. Final round of processing and clustering 
+
+```bash
 #Repeat the processing with SCTransform, dimensionality reduction and clustering.
 #This time, SCTransform will be run in the full mode, i.e will return all genes 
 SAMN12614700.filtered <- SCTransform(SAMN12614700.filtered, conserve.memory=FALSE)
@@ -322,3 +326,5 @@ VlnPlot(SAMN12614700.filtered, features = c("nFeature_RNA", "nCount_RNA", "perce
 
 Any threshold for filtering genes should be informed by your experimental design, including the number of cells in the dataset and the number of cells in the smallest cluster of interest [(Leucken and Theis, 2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746).
 * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+Next, see the [Donor integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/4.%20Donor%20integration).

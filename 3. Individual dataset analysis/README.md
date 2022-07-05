@@ -7,10 +7,9 @@ An overview of the secondary analysis steps:
 1. [Read data into R](#1-read-data-into-r)
 2. [Pre-processing and preliminary clustering](#2-Pre-processing-and-preliminary-clustering)
 3. [Correct for ambient gene expression using SoupX](#3-Correct-for-ambient-gene-expression-using-SoupX) (vignette available [here](https://rawcdn.githack.com/constantAmateur/SoupX/204b602418df12e9fdb4b68775a8b486c6504fe4/inst/doc/pbmcTutorial.html))
-4. QC and removal of outlying clusters
-5. Repeat pre-processing and clustering
-3. `DoubletFinder` to identify and remove doublets
-4. Final round of processing and clustering 
+4. [QC and removal of outlying clusters](#4-QC-and-removal-of-outlying-clusters)
+5. [Remove doublets with DoubletFinder](#5-Remove-doublets-with-DoubletFinder)
+6. Final round of processing and clustering 
 
 A conda environment for the analysis can be created as follows:
 
@@ -162,7 +161,7 @@ Cells where ALB has significant expression, above that of the background "soup" 
 
 Create a Seurat data object from the four corrected replicates. This step will involve some initial filtering, to excluded genes detected in less than 3 cells and to exclude cells with less than 200 detected genes. 
 
-### QC and filtering 
+## 4. QC and removal of outlying clusters
 
 ```R 
 SAMN12614700.noSoup <- CreateSeuratObject(counts = out, project = "SAMN12614700",  min.cells = 3, min.features = 200)
@@ -218,7 +217,7 @@ SAMN12614700.filtered <- FindNeighbors(object = SAMN12614700.filtered, dims = 1:
 SAMN12614700.filtered <- FindClusters(object = SAMN12614700.filtered, verbose = FALSE)
 ```
 
-## Remove doublets
+## 5. Remove doublets with DoubletFinder
 
 Next, doublets will be identified and removed by `doubletFinder`. (Note, you can check the number of informative dimensions with an ElbowPlot `ElbowPlot(SRR10009414_control.noSoup.SCT)`).
 

@@ -5,8 +5,8 @@ The following analysis will be carried out in R. I recommend to run a Jupyter no
 An overview of the secondary analysis steps:
 
 1. [Read data into R](#1-read-data-into-r)
-2. Pre-processing and preliminary clustering
-2. Correct for ambient gene expression using `SoupX` (vignette available [here](https://rawcdn.githack.com/constantAmateur/SoupX/204b602418df12e9fdb4b68775a8b486c6504fe4/inst/doc/pbmcTutorial.html))
+2. [Pre-processing and preliminary clustering](#2-Pre-processing-and-preliminary-clustering)
+3. [Correct for ambient gene expression using SoupX](#Correct-for-ambient-gene-expression-using-SoupX) (vignette available [here](https://rawcdn.githack.com/constantAmateur/SoupX/204b602418df12e9fdb4b68775a8b486c6504fe4/inst/doc/pbmcTutorial.html))
 4. QC and removal of outlying clusters
 5. Repeat pre-processing and clustering
 3. `DoubletFinder` to identify and remove doublets
@@ -57,6 +57,8 @@ SAMN12614700 <- CreateSeuratObject(counts = SAMN12614700.data, project = "SAMN12
 ```
 
 The output shows that there is `26276 features across 5560 samples within 1 assay`, meaning 26,276 expressed genes and 5,560 cells. 
+
+## 2. Pre-processing and preliminary clustering
 
 The following round of pre-processing will include normalization, clustering and marker gene identification. The normalization will be carried out using [`SCTransform`](https://satijalab.org/seurat/articles/sctransform_vignette.html), which normalizes using a negative binominal in place of a scale factor. SCTransform has been reported to recover improved biological meaning compared to log-normalization based on a scale factor. 
 
@@ -114,7 +116,7 @@ head(SAMN12614700@meta.data)
 The UMAP coordinates for each barcode are in the UMAP_1 and UMAP_2 columns:
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/new_metaData.png" width="800">
 
-### SoupX
+## 3. Correct for ambient gene expression using SoupX
 
 `SoupX` will be used to correct ambient gene expression. SoupX will read the data from CellRanger, including both the gene count matrices for the raw data (all droplets) and the filtered droplets. The raw data is used to estimate the contaminating gene counts, the *ambient gene expression*. The 'soup' model is created as part of the `load10X` command and the raw counts are removed afterwards. SoupX will be run on each of the four technical replicates prior to merging the background-corrected gene count matrices:
 

@@ -1,7 +1,16 @@
 # Analysis of Liver scRNA-seq (10X genomics)
 This Github describes the pipeline used by the Cebola Lab to analyse single-cell RNA-seq data (scRNA-seq) from 10X Genomics. 
 
+This scRNA-seq analysis tutorial is split into several chapters and will focus on analysis of liver samples.
+
 ## Table of contents
+
+1. [Introduction to single-cell transcriptomics and the liver]
+2. [Data preparation using cellranger]
+3. [Individual dataset analysis]
+4. [Donor integration]
+5. [Pseudobulk counts and visualising bigwigs](https://github.com/CebolaLab/scRNA/tree/main/9.pseudobulk_counts_bigwigs).
+
 
 1. [Pipeline overview](#1-Pipeline-overview)  
 2. [Background](#2-Background): 

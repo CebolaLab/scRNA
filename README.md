@@ -13,6 +13,9 @@ This Github describes the pipeline used by the Cebola Lab to analyse single-cell
 5. [Cellranger count](#5-Cellranger-count)
 6. [Secondary analysis](#6-Secondary-analysis)
 7. [Cell type identity](#7-cell-type-identity)
+8. [Samples integration]()
+9. [Pseudobulk RNA counts]()
+10. [Generate bigwigs and visualise data]()
 
 ## 1. Pipeline overview
 
@@ -89,6 +92,8 @@ The published scRNA-seq studies of the liver have uncovered many novel cell type
 
 Briefly, studies in mice have also uncovered interesting mechanisms, including zone-Specific alterations of LSECs in cirrhotic mouse liver [(Su et al. 2021)](https://www.sciencedirect.com/science/article/pii/S2352345X2030206X).
 
+Look at Xiong et al. 2019 (Landscape of intercellular crosstalk in healthy and NASH liver revealed by single-cell secretome gene analysis) and Terkelsen et al. (GSE145086).
+
 ### Methods for the analysis of scRNA-seq data
 
 #### Alignment, demultiplexing and quantification
@@ -140,7 +145,9 @@ Integrate datasets which have been normalised using SCTransform [vignette](https
 
 #### Dataset integration
 
-Here, we opt to process biological replicates independently and then integrate them using the [recommended Seurat pipeline](https://satijalab.org/seurat/articles/integration_introduction.html) on integrating datasets. Specifically, we follow steps to integrate datasets normalized with SCTransform (`PrepSCTIntegration()` > `FindIntegrationAnchors()` > `IntegrateData()`, with the normalization.method parameter to the value SCT).
+Here, we opt to process biological replicates independently and then integrate them using the [recommended Seurat pipeline](https://satijalab.org/seurat/articles/integration_introduction.html) on integrating datasets (see also [this link](https://satijalab.org/seurat/archive/v3.1/integration.html#sctransform)). Specifically, we follow steps to integrate datasets normalized with SCTransform (`PrepSCTIntegration()` > `FindIntegrationAnchors()` > `IntegrateData()`, with the normalization.method parameter to the value SCT).
+
+(Note, [Harmony](https://portals.broadinstitute.org/harmony/articles/quickstart.html) may be an alternative.)
 
 #### Differential expression and pseudobulk expression  
 *TBC*
@@ -545,6 +552,8 @@ Here, we will use Seurat `PercentageFeatureSet`:
 
 *"This function enables you to easily calculate the percentage of all the counts belonging to a subset of the possible features for each cell. This is useful when trying to compute the percentage of transcripts that map to mitochondrial genes for example. The calculation here is simply the column sum of the matrix present in the counts slot for features belonging to the set divided by the column sum for all features times 100."*
 
+**Note**: take a look at the *AddmoduleScore* function in Seurat which "represents the average expression of all genes within a cell population subtracted by the average expression of randomly selected genes in the same population.
+
 ```R
 markers=read.table('liver.markers',sep='\t')
 LSEC.markers=read.table('LSEC.markers')
@@ -617,7 +626,7 @@ DimPlot(object = SAMN12614700.filtered, label = TRUE, reduction = "umap") + NoLe
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/labelled_UMAP.png" height="500">
 
-## Integrating biological replicates
+## 8. Donor integration
 
 Up to here, biological replicates have been processed independently. This provides an opportunity to assess replicate similarity including by calculating Pearson correlation for cell-type clusters across replicates.
 
@@ -639,6 +648,16 @@ An alternative workflow for **large datasets** employs [reference-based integrat
 - Run PCA on each object in the list
 - Integrate datasets, and proceed with joint analysis
 
+## 9. Pseudobulk RNA counts
+
+## 10. Generate bigwigs and visualise data
+
+Here, we will generate bigwig files for each cell type. This will use `sinto` to subset bam files for each donor according to the cell type ID. Then, corresponding bam files will be merged and bigwigs generated using `deeptools` and `macs2`.
+
+
+
+
+
 # References and resources
 
 - [Leucken and Theis (2019)](https://www.embopress.org/doi/full/10.15252/msb.20188746): A 2019 effort to compile current best practises in scRNA-seq. This paper is very useful for "newbies" and gives an excellent overview of the essential steps of scRNA-seq analysis (note that some specific tools mentioned are superceeded by more recent published tools).
@@ -657,7 +676,6 @@ e.g. [Xu et al. (2021)](https://academic.oup.com/hmg/article/30/5/370/6131713?lo
 
 
  **Recommendations**: *do not* run `DoubletFinder` on aggregated scRNA-seq data representing multiple distinct samples and filter your data first to remove low-quality cell clusters. The authors recommends (1) manually threshold raw gene expression matrices according to RNA nUMIs, (2) pre-process data using [standard workflow](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html), including data normalization and scaling (3) identify clusters with low RNA UMIs, high % mitochondrial reads and/or uninformative marker genes, (4) remove clusters, pre-process again, and run DoubletFinder.
-
 
 
 Note...sctransform was used by the Satija lab in their 2022 [publication](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02584-9#Sec8)

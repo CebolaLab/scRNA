@@ -6,7 +6,7 @@ An overview of the secondary analysis steps:
 
 1. [Read data into R](#1-read-data-into-r)
 2. [Pre-processing and preliminary clustering](#2-Pre-processing-and-preliminary-clustering)
-3. [Correct for ambient gene expression using SoupX](#Correct-for-ambient-gene-expression-using-SoupX) (vignette available [here](https://rawcdn.githack.com/constantAmateur/SoupX/204b602418df12e9fdb4b68775a8b486c6504fe4/inst/doc/pbmcTutorial.html))
+3. [Correct for ambient gene expression using SoupX](#3-Correct-for-ambient-gene-expression-using-SoupX) (vignette available [here](https://rawcdn.githack.com/constantAmateur/SoupX/204b602418df12e9fdb4b68775a8b486c6504fe4/inst/doc/pbmcTutorial.html))
 4. QC and removal of outlying clusters
 5. Repeat pre-processing and clustering
 3. `DoubletFinder` to identify and remove doublets

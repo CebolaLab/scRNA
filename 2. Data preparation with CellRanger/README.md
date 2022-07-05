@@ -59,4 +59,4 @@ cellranger count --nosecondary --id <ID> --transcriptome <PATH>
 #cellranger count --nosecondary --id SAMN12614700 --sample SRR10009414,SRR10009415,SRR10009416,SRR10009417 --transcriptome $GENOMEDIR/GRCh38 --fastqs SAMN12614700/
 ``` 
 
-Next, check out the (individual dataset analysis pipeline)[https://github.com/CebolaLab/scRNA/tree/main/3.%20Individual%20dataset%20analysis] tutorial.
+Next, check out the [individual dataset analysis pipeline](https://github.com/CebolaLab/scRNA/tree/main/3.%20Individual%20dataset%20analysis) tutorial.

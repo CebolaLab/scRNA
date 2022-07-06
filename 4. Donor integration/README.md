@@ -92,12 +92,11 @@ markers=subset(markers,markers[,1] %in% rownames(liver.integrated@assays$SCT@cou
 LSEC.markers=subset(LSEC.markers,LSEC.markers[,1] %in% rownames(liver.integrated@assays$SCT@counts))
 markers=rbind(markers,cbind(V1=LSEC.markers,V2='LSEC'))
 
-#Using PercentageFeatureSet, assign to each cell the % gene expression from each set of marker genes
-#Assign to the metadata, for each cell, the % of total gene expression which is from the gene set. 
+#Using PercentageFeatureSet, assign to the metadata for each cell the % gene expression 
+#from each set of marker genes
 for(x in unique(markers[,2])){
     name=gsub(' ','.',x)
     features=as.character(subset(markers,markers[,2]==x)[,1])
-    #class(features)
     liver.integrated[[name]]<-PercentageFeatureSet(liver.integrated,features = features, assay = 'RNA')
 }
 

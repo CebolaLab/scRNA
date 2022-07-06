@@ -158,5 +158,16 @@ heatmap(as.matrix(cell_type.scores[,-1]),scale="column",margins=c(10,6),labRow=c
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/cell_colour_heatmap.png" height="600">
 
-Next, see the [pseudobulk count and bigwig visualisation integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/9.pseudobulk_counts_bigwigs).
+Once your clusters have been labelled, (1) save these identities in a file and (2) create pseudobulk count data which will reflect cell-type specific expression levels.
+
+```R
+identity=as.data.frame(Idents(liver.integrated))
+write.table(identity,'cell_identity.txt',sep='\t',quote=FALSE,row.names=TRUE,col.names=FALSE)
+
+pseudocount=AggregateExpression(object=liver.integrated,slot="counts",assays="RNA")
+write.table(pseudocount$RNA,'pseudo_counts.txt',sep='\t',quote=FALSE,col.names=TRUE,row.names=TRUE)
+```
+
+
+Next, see the [pbigwig visualisation integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/9.bigwigs).
 

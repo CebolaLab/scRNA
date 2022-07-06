@@ -86,6 +86,12 @@ The next step is to read in a list of defined marker genes, here obtained from P
 
 ### Marker gene expression and cluster annotation 
 
+These following steps will:
+
+1. Read in a list of marker genes (gene sets) for liver cell types
+2. Calculate the % expression from the genes in each gene set per-cell
+3. Identify marker genes for each Seurat cluster
+
 ```R
 #Upload cell types markers and create a merged dataframe 
 markers=read.table('liver.markers',sep='\t')

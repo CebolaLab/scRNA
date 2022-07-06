@@ -1,5 +1,5 @@
 
-## 8. Donor integration
+## 4. Donor integration
 
 Up to now, biological replicates have been processed independently. This provides an opportunity to assess replicate similarity including by calculating Pearson correlation for cell-type clusters across replicates, and to remove low-quality cells from each donor.
 
@@ -199,8 +199,23 @@ endo.markers=rbind(cbind(V1=nonLSECs,V2='nonLSECs'),
                    cbind(V1=LSEC.periportal.extended, V2="LSEC.periportal.extended"),
                    cbind(V1=LSEC.mid, V2='LSEC.mid'),
                    cbind(V1=LSEC.pericentral,V2='LSEC.pericentral'))
+
+#Again add the % gene expression to the metadata
+#?PercentageFeatureSet
+for(x in unique(endo.markers[,2])){
+    name=gsub(' ','.',x)
+    features=as.character(subset(endo.markers,endo.markers[,2]==x)[,1])
+    #class(features)
+    Endothelial2[[name]]<-PercentageFeatureSet(Endothelial2,features = features, assay = 'RNA')
+}
+
+FeaturePlot(object = Endothelial2, features = c("LSEC","nonLSECs","LSEC.central.venous.extended",
+                                               "LSEC.periportal.extended"),
+            label=FALSE, max.cutoff = c(20,0.6,4,1)) 
 ```
 
 
-Next, see the [pbigwig visualisation integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/9.bigwigs).
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endo_colour_UMAP.png" height="600">
+
+Next, see the [bigwig visualisation tutorial](https://github.com/CebolaLab/scRNA/tree/main/5.%20Bigwig%20visualisation).
 

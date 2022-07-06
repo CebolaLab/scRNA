@@ -7,6 +7,7 @@ Following this [Seurat tutorial](https://satijalab.org/seurat/articles/integrati
 
 1. [Integrate donor data](#Step-one---Integrate-donor-data)
 2. [Dimensionality reduction (PCA/UMAP) and clustering](#Step-2---dimensionality-reduction-and-clustering)
+3. [Marker gene expression and cluster annotation](#Step-3---Marker-gene-expression-and-cluster-annotation)
 
 First, load (and if necessary, install) the required libraries:
 ```R
@@ -72,8 +73,6 @@ liver.integrated <- FindNeighbors(object = liver.integrated, dims = 1:20, verbos
 liver.integrated <- FindClusters(object = liver.integrated, verbose = FALSE)
 ```
 
-### Visualise UMAP and donor integration
-
 You can now view the UMAP and colour the cells by original donor, to access how successful the integration has been. You may want to test different integration methods and select the one which shows the best mixing of the donors (i.e.the data is not clustering by donor, but by cell type).
 
 ```R
@@ -87,7 +86,7 @@ plots & theme(legend.position = "top", ) & guides(color = guide_legend(nrow = 3,
 
 The next step is to read in a list of defined marker genes, here obtained from PangloaDB:
 
-### Marker gene expression and cluster annotation 
+### Step 3 - Marker gene expression and cluster annotation 
 
 These following steps will:
 

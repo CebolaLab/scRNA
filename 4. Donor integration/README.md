@@ -215,7 +215,7 @@ FeaturePlot(object = Endothelial2, features = c("LSEC","nonLSECs","LSEC.central.
 ```
 
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endo_colour_UMAP.png" height="600">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endo_colour_UMAP.png" height="400">
 
 Next, see the [bigwig visualisation tutorial](https://github.com/CebolaLab/scRNA/tree/main/5.%20Bigwig%20visualisation).
 

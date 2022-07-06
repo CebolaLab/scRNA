@@ -37,7 +37,7 @@ library(scater)
 library(cowplot)
 ```
 
-### Step one Integrate donor data
+### Step one - Integrate donor data
 
 ```R
 #Create a list with the Seurat objects for the donors
@@ -63,7 +63,7 @@ An alternative workflow for **large datasets** employs [reference-based integrat
 
 As before, dimensionality reduction and clustering will be run on the now integrated data. 
 
-### Step 2 Dimensionality reduction and clustering
+### Step 2 - Dimensionality reduction and clustering
 
 ```R
 liver.integrated <- RunPCA(liver.integrated, verbose = FALSE)

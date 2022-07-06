@@ -299,7 +299,7 @@ FeaturePlot(object = LSECs, features = c("LSEC.central.venous.extended",
             max.cutoff = c(5,0.5,1))
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_UMAP.png" height="400">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_UMAP.png" height="500">
 
 
 ### Functional pseudotime analysis

@@ -218,5 +218,25 @@ Note that the peripotal LSEC markers have some overlapping expression with non-L
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endo_colour_UMAP.png" height="400">
 
+Clusters which don't score positively with any of the endothelial sets and cluster seperately may indicate carry over of other cells types. In this case, repeat the steps to determine per-cluster marker genes. Here, it may be useful to search the [Human Protein Atlas](https://www.proteinatlas.org/ENSG00000164825-DEFB1/single+cell+type) (HPA) to explore the expression of the identified marker genes in published scRNA-seq data from liver. For example:
+
+```R
+#Find markers for every cluster compared to all remaining cells, report only the positive ones
+Endo.markers <- FindAllMarkers(Endothelial2, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+markers=Endo.markers %>%
+    group_by(cluster) %>%
+    slice_max(n = 5, order_by = avg_log2FC)
+```
+
+Here, clusters 9, 11 and 13 were not clearly assigned to any of the endothelial populations. The marker genes identified by `FindAllMarkers` are:
+
+- Cluster 9: DEFB1, TM4SF4, SERPINA1, ANXA4, KRT8
+- Cluster 11: TAGLN, ACTA2, MYL9, RGS5, TPM2
+- Cluster 13: CCL21, TFF3, FABP4, NTS, FABP5
+
+According to the HPA, the genes for cluster 9 are highly expressed in cholangiocytes, while the cluster 11 genes are highly expressed in stellate cells. The cluster 13 genes are less specific, but are consistently expressed in stellate cells.
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endo_UMAP.png" height="400">
+
 Next, see the [bigwig visualisation tutorial](https://github.com/CebolaLab/scRNA/tree/main/5.%20Bigwig%20visualisation).
 

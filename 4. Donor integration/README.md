@@ -214,6 +214,7 @@ FeaturePlot(object = Endothelial2, features = c("LSEC","nonLSECs","LSEC.central.
             label=FALSE, max.cutoff = c(20,0.6,4,1)) 
 ```
 
+Note that the peripotal LSEC markers have some overlapping expression with non-LSEC endothelial cells, so the periportal markers are likely to also "light up" the non-LSEC clusters. The cluster with periportal LSECs is likely to have the "nonLSECs" markers showing little to no blue but a positive score from the periportal markers. 
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endo_colour_UMAP.png" height="400">
 

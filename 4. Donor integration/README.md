@@ -69,6 +69,8 @@ liver.integrated <- FindNeighbors(object = liver.integrated, dims = 1:20, verbos
 liver.integrated <- FindClusters(object = liver.integrated, verbose = FALSE)
 ```
 
+### Visualise UMAP and donor integration
+
 You can now view the UMAP and colour the cells by original donor, to access how successful the integration has been. You may want to test different integration methods and select the one which shows the best mixing of the donors (i.e.the data is not clustering by donor, but by cell type).
 
 ```R
@@ -78,7 +80,7 @@ plots & theme(legend.position = "top", ) & guides(color = guide_legend(nrow = 3,
     override.aes = list(size = 3))) 
 ```
 
-<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/first_integrated_UMAP.png" height="700">
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/first_integrated_UMAP.png" height="600">
 
 The next step is to read in a list of defined marker genes, here obtained from PangloaDB:
 
@@ -89,6 +91,16 @@ LSEC.markers=read.table('LSEC.markers')
 markers=subset(markers,markers[,1] %in% rownames(liver.integrated@assays$SCT@counts))
 LSEC.markers=subset(LSEC.markers,LSEC.markers[,1] %in% rownames(liver.integrated@assays$SCT@counts))
 markers=rbind(markers,cbind(V1=LSEC.markers,V2='LSEC'))
+
+#Using PercentageFeatureSet, assign to each cell the % gene expression from each set of marker genes
+#Assign to the metadata, for each cell, the % of total gene expression which is from the gene set. 
+for(x in unique(markers[,2])){
+    name=gsub(' ','.',x)
+    features=as.character(subset(markers,markers[,2]==x)[,1])
+    #class(features)
+    liver.integrated[[name]]<-PercentageFeatureSet(liver.integrated,features = features, assay = 'RNA')
+}
+
 ```
 
 Next, see the [pseudobulk count and bigwig visualisation integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/9.pseudobulk_counts_bigwigs).

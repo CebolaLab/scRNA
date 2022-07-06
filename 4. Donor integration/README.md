@@ -62,6 +62,8 @@ An alternative workflow for **large datasets** employs [reference-based integrat
 
 As before, dimensionality reduction and clustering will be run on the now integrated data. 
 
+### Step 1, dimensionality reduction and clustering
+
 ```R
 liver.integrated <- RunPCA(liver.integrated, verbose = FALSE)
 liver.integrated <- RunUMAP(liver.integrated, dims = 1:20)
@@ -115,6 +117,8 @@ cluster.markers=liver.cluster.markers %>%
     group_by(cluster) %>%
     slice_max(n = 5, order_by = avg_log2FC)
 ```
+
+Check `cluster.markers` and if any cluster show mitochondrial marker genes, these clusters should be removed and [step one](#Step-1-dimensionality-reduction-and-clustering) repeated. 
 
 Next, see the [pseudobulk count and bigwig visualisation integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/9.pseudobulk_counts_bigwigs).
 

@@ -168,6 +168,39 @@ pseudocount=AggregateExpression(object=liver.integrated,slot="counts",assays="RN
 write.table(pseudocount$RNA,'pseudo_counts.txt',sep='\t',quote=FALSE,col.names=TRUE,row.names=TRUE)
 ```
 
+Next, further clustering can be carried out. In this case, we will identify liver sinusoidal endothelial cells (LSECs) from the endothelial cluster, then further cluster periportal, pericentral and central venous LSECs using pseudotime and diffusion analysis. 
+
+
+```R
+Endothelial=subset(liver.integrated, idents = "Endothelial")
+#SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
+Endothelial <- SCTransform(Endothelial, conserve.memory=TRUE,return.only.var.genes=FALSE)
+all.genes <- rownames(Endothelial)
+Endothelial <- RunPCA(Endothelial, features = all.genes)
+Endothelial <- RunUMAP(Endothelial, dims = 1:20)
+Endothelial <- FindNeighbors(object = Endothelial, dims = 1:20, verbose = FALSE)
+Endothelial <- FindClusters(object = Endothelial, verbose = FALSE)
+```
+
+Create a list of known marker genes for zonated LSECs:
+```R
+#Central venous LSECs
+LSEC.central.venous.extended=c('FCGR2B','STAB2','LYVE1','CD14','ICAM1',"FCN3","FCN2") #ICAM1 = CD54,FCGR2B = CD32B,"THBD" 
+#Periportal LSECs
+#Note periportal express PECAM1, but so do non-LSECs
+LSEC.periportal.extended=c('PECAM1','F8',"SPARCL1","CLEC14A") #"DLL4","MSR1","LTBP4","NTN4") #CD31 = PECAM1 PECAM1, MRS1
+nonLSECs=c('VWF',"CD34","ENG","ACKR1",'PECAM1') #CD34?  ACKR1','CD34','PECAM1
+#CD36
+LSEC.mid=c('LYVE1','CTSL')
+LSEC.pericentral='KIT'
+
+endo.markers=rbind(cbind(V1=nonLSECs,V2='nonLSECs'),
+                   cbind(V1=LSEC.central.venous.extended,V2="LSEC.central.venous.extended"),
+                   cbind(V1=LSEC.periportal.extended, V2="LSEC.periportal.extended"),
+                   cbind(V1=LSEC.mid, V2='LSEC.mid'),
+                   cbind(V1=LSEC.pericentral,V2='LSEC.pericentral'))
+```
+
 
 Next, see the [pbigwig visualisation integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/9.bigwigs).
 

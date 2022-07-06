@@ -5,8 +5,8 @@ Up to now, biological replicates have been processed independently. This provide
 
 Following this [Seurat tutorial](https://satijalab.org/seurat/articles/integration_introduction.html), we will [integrate biological replicates which have been processed and normalised using SCTranform](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1874-1) with `SelectIntegrationFeatures` > `PrepSCTIntegration()` > `FindIntegrationAnchors()` > `IntegrateData()` (use the normalization.method = "SCT" option where appropriate). See also the [Fast integration using reciprocal PCA (RPCA) vignette](https://satijalab.org/seurat/articles/integration_rpca.html). The steps will follow:
 
-1. [Integrate donor data](#Step-one-Integrate-donor-data)
-2. [Dimensionality reduction (PCA/UMAP) and clustering](#Step-2-dimensionality-reduction-and-clustering)
+1. [Integrate donor data](#Step-one---Integrate-donor-data)
+2. [Dimensionality reduction (PCA/UMAP) and clustering](#Step-2---dimensionality-reduction-and-clustering)
 
 First, load (and if necessary, install) the required libraries:
 ```R

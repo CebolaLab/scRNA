@@ -120,5 +120,43 @@ cluster.markers=liver.cluster.markers %>%
 
 Check `cluster.markers` and if any cluster show mitochondrial marker genes, these clusters should be removed and [step two](#Step-2-dimensionality-reduction-and-clustering) repeated. 
 
+
+Optional additional data exploration:
+```R
+liver.integrated=BuildClusterTree(liver.integrated)
+Tool(object = liver.integrated, slot = 'BuildClusterTree')
+PlotClusterTree(object = liver.integrated)
+```
+
+You can now colour the UMAP by the % expression for the gene sets, as assigned above. Adjust the `max.cutoff` parameter for the colour to be more or less intensive.
+```R
+FeaturePlot(object = liver.integrated, features = "Kupffer.cells",label=TRUE, max.cutoff=20) 
+FeaturePlot(object = liver.integrated, features = "Endothelial.cells",label=TRUE)
+FeaturePlot(object = liver.integrated, features = "Cholangiocytes",label=TRUE, max.cutoff = 5) 
+FeaturePlot(object = liver.integrated, features = "Hepatic.stellate.cells", label=TRUE, max.cutoff=10)
+```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/cell_colour_UMAP.png" height="600">
+
+Clusters can be renamed as shown:
+
+```R
+liver.integrated <- RenameIdents(liver.integrated, '5'='Stellate cells','9'='Stellate cells',
+                                 '11'='Cholangiocyte','12'='Cholangiocyte',
+                                 '0'='Endothelial','1'='Endothelial','2'='Endothelial','3'='Endothelial','8'='Endothelial',
+                                 '10'='Endothelial','13'='Endothelial','14'='Endothelial','20'='Endothelial')
+```
+
+Another way of viewing which clusters score most highly in terms of gene expression from the gene sets is via heatmap:
+
+```R
+metaData=liver.integrated@meta.data
+cell.types=gsub(' ','.',unique(markers[,2]))
+cell_type.scores=aggregate(metaData[,cell.types], list(Idents(liver.integrated)), mean)
+heatmap(as.matrix(cell_type.scores[,-1]),scale="column",margins=c(10,6),labRow=cell_type.scores[,1])
+```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/cell_colour_heatmap.png" height="600">
+
 Next, see the [pseudobulk count and bigwig visualisation integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/9.pseudobulk_counts_bigwigs).
 

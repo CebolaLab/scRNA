@@ -206,10 +206,10 @@ for(x in unique(endo.markers[,2])){
     name=gsub(' ','.',x)
     features=as.character(subset(endo.markers,endo.markers[,2]==x)[,1])
     #class(features)
-    Endothelial2[[name]]<-PercentageFeatureSet(Endothelial2,features = features, assay = 'RNA')
+    Endothelial[[name]]<-PercentageFeatureSet(Endothelial,features = features, assay = 'RNA')
 }
 
-FeaturePlot(object = Endothelial2, features = c("LSEC","nonLSECs","LSEC.central.venous.extended",
+FeaturePlot(object = Endothelial, features = c("LSEC","nonLSECs","LSEC.central.venous.extended",
                                                "LSEC.periportal.extended"),
             label=FALSE, max.cutoff = c(20,0.6,4,1)) 
 ```
@@ -222,7 +222,7 @@ Clusters which don't score positively with any of the endothelial sets and clust
 
 ```R
 #Find markers for every cluster compared to all remaining cells, report only the positive ones
-Endo.markers <- FindAllMarkers(Endothelial2, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+Endo.markers <- FindAllMarkers(Endothelial, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
 markers=Endo.markers %>%
     group_by(cluster) %>%
     slice_max(n = 5, order_by = avg_log2FC)
@@ -237,6 +237,136 @@ Here, clusters 9, 11 and 13 were not clearly assigned to any of the endothelial 
 According to the HPA, the genes for cluster 9 are highly expressed in cholangiocytes, while the cluster 11 genes are highly expressed in stellate cells. The cluster 13 genes are less specific, but are consistently expressed in stellate cells.
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/Endo_UMAP.png" height="400">
+
+Again, save the cell identities and pseudocount data before extracting the LSECs for further clustering:
+
+```R
+identity.endo=as.data.frame(Idents(Endothelial))
+write.table(identity.endo,'cell_Endothelial_identity.txt',sep='\t',quote=FALSE,row.names=TRUE,col.names=FALSE)
+
+#head(liver.integrated@assays$RNA@counts)
+pseudocount.endo=AggregateExpression(object=Endothelial,slot="counts",assays="RNA")
+write.table(pseudocount.endo$RNA,'pseudo_counts_Endo.txt',sep='\t',quote=FALSE,col.names=TRUE,row.names=TRUE)
+```
+
+## LSEC clustering
+
+LSECs have been described as reflecting liver zonation in their function and gene expression. Previous publications (**get citations**) have assigned (**three**)? zones:
+
+- Zone 1 = periportal LSECs
+- Zone 3 
+
+
+[Su et al.](https://www.sciencedirect.com/science/article/pii/S2352345X2030206X) **mouse study**:
+Arterial-like ECs = Vwf 
+Midzonal markers = Lyve1 and Ctsl
+Periportal landmarks: CD36, Dll4 and Efnb2... Msr1, Ltbp4, Ntn4, and Adam23
+Pericentral: Kit
+Central venous: Thbd
+Lymphatic ECs: IL7
+
+[MacParland et al. 2018](https://www.nature.com/articles/s41467-018-06318-7). (Note citation of bulk RNA-seq studies on sorted LSECs (Shahani et al. 2014),
+
+**Periportal ("most abundant")**: Recently, immunofluorescent staining was used to describe the zonation of human LSECs and a population of CD36hi CD32B− CD14− LYVE1− LSECs in Zone 1 of the hepatic acinus (the periportal area). Enriched expression of F8, PECAM1, with little expression of CD32B, LYVE-1, STAB2, and CD14. (Top DE genes: MGP, SPARCL1, TM4SF1, CLEC14A, ID1, IGFBP7, ADIRF, CTGF, VWF, CD9, C7, SRPX, ID3, CAV1, GNG11, AQP1, HSPG2, EMP1, SOX18, CLDN5). In line with previous work32, we propose that these endothelial cells are likely periportal LSECs (Zone 1). 
+
+**Central venous ("second most abundant")**: enriched expression of CD32B, LYVE1, STAB2, with little expression of VWF. LYVE-1+, CD32Bhi, CD14+, CD54+, CD36mid-lo. (Top DE genes: CCL14, CLEC1B, FCN2, S100A13, FCN3, CRHBP, STAB1, GNG11, IFI27, CLEC4G, CLDN5, CCL23, OIT3, RAMP3, SGK1, DNASE1L3, LIFR, SPARC, ADGRL4, EGFL7, PCAT19, CDKN1C). (Note Strauss et al. histological examination). 
+
+**Non-LSECs**: The least abundant hepatic endothelial cell population (Cluster 13) was characterized by low or no expression of LSEC markers (LYVE1, STAB2, CD32B). These cells are likely non-LSEC endothelial cells including central vein and portal arterial and venous endothelial cells based on the expression of ENG (protein alias CD105) and PECAM1 (protein alias CD31) as has been described in the human liver via immunohistochemistry32. (Top DE genes: RAMP3, INMT, DNASE1L3, LIFR, PTGDS, C7, CTGF, TIMP3, RNASE1, ID3, ENG, MGP, PCAT19, HSPG2, GPM6A, PTPRB, VWF, FAM167B, SRPX, LTC4S, IFI27)
+
+
+Three endothelial cell populations which were less proliferative than immune cells and expressed CALCRL (Fig. 5c.i) and RAMP2, suggesting sensitivity to adrenomedullin signaling37. 
+
+```R
+LSECs=subset(Endothelial, idents = "LSECs")
+#SCTransform can be used in place of the NormalizeData, FindVariableFeatures, ScaleData workflow.
+LSECs <- SCTransform(LSECs, conserve.memory=TRUE,return.only.var.genes=FALSE)
+all.genes <- rownames(LSECs)
+LSECs <- RunPCA(LSECs, features = all.genes)
+LSECs <- RunUMAP(LSECs, dims = 1:20)
+LSECs <- FindNeighbors(object = LSECs, dims = 1:20, verbose = FALSE)
+LSECs <- FindClusters(object = LSECs, verbose = FALSE)
+
+#?PercentageFeatureSet
+for(x in unique(endo.markers[,2])){
+    name=gsub(' ','.',x)
+    features=unique(as.character(subset(endo.markers,endo.markers[,2]==x)[,1]))
+    LSECs[[name]]<-PercentageFeatureSet(LSECs,features = features, assay = 'RNA')
+}
+
+#LSEC.central.venous, LSEC.periportal
+FeaturePlot(object = LSECs, features = c("LSEC.central.venous.extended",
+            "LSEC.periportal.extended","LSEC.mid"), label=TRUE,
+            max.cutoff = c(5,0.5,1))
+```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_UMAP.png" height="400">
+
+
+### Functional pseudotime analysis
+
+Next, we will carry out functional pseudotime analysis, following this Broad Institute [tutorial](https://broadinstitute.github.io/2019_scWorkshop/functional-pseudotime-analysis.html).
+
+```R
+LSECs.sc=as.SingleCellExperiment(LSECs)
+# Run PCA. Use the runPCA function from the SingleCellExperiment package.
+LSECs.sc <- runPCA(LSECs.sc, ncomponents = 50)
+
+# Use the reducedDim function to access the PCA and store the results. 
+pca <- reducedDim(LSECs.sc, "PCA")
+LSECs.sc$PC1 <- pca[, 1]
+LSECs.sc$PC2 <- pca[, 2]
+
+ggplot(as.data.frame(colData(LSECs.sc)), aes(x = PC1, y = PC2, color = seurat_clusters)) + geom_quasirandom(groupOnX = FALSE) +
+    theme_classic() + #scale_color_tableau() + 
+    xlab("PC1") + ylab("PC2") + ggtitle("PC biplot")
+
+LSECs.sc$pseudotime_PC1 <- rank(LSECs.sc$PC1)  # rank cells by their PC1 score
+ggplot(as.data.frame(colData(LSECs.sc)), aes(x = pseudotime_PC1, y = seurat_clusters, 
+    colour = seurat_clusters)) + geom_quasirandom(groupOnX = FALSE) +
+    theme_classic() + xlab("PC1") + ylab("Timepoint") +
+    ggtitle("Cells ordered by first principal component")
+```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_PCA.png" height="400">
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_PCAtime.png" height="400">
+
+We can see the expression of marker genes according to principal component 1:
+
+```R
+#Central venous markers
+plotExpression(LSECs.sc, c("CD14","LYVE1","ICAM1","STAB2","FCGR2B","THBD"), x = "PC1", colour_by = "seurat_clusters", show_violin = FALSE,show_smooth = TRUE)
+#Periportal markers
+plotExpression(LSECs.sc, c("CD36","PECAM1","F8","DLL4","LTBP4","NTN4"), x = "PC1", colour_by = "seurat_clusters", show_violin = FALSE,show_smooth = TRUE)
+```
+
+The data can also be explored using a diffusion map approach:
+```R
+#  Prepare a counts matrix with labeled rows and columns. 
+LSECs.counts <- as.data.frame(logcounts(LSECs.sc))  # access log-transformed counts matrix
+cellLabels <- LSECs.sc$seurat_clusters
+colnames(LSECs.counts) <- cellLabels
+
+# Make a diffusion map.
+dm <- DiffusionMap(t(LSECs.counts),n_pcs = 50)
+# Plot diffusion component 1 vs diffusion component 2 (DC1 vs DC2). 
+tmp <- data.frame(DC1 = eigenvectors(dm)[, 1],
+                  DC2 = eigenvectors(dm)[, 2],
+                  Timepoint = LSECs.sc$seurat_clusters)
+ggplot(tmp, aes(x = DC1, y = DC2, colour = Timepoint)) +
+    geom_point() + #scale_color_tableau() + 
+    xlab("Diffusion component 1") + 
+    ylab("Diffusion component 2") +
+    theme_classic()
+```
+
+<img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/LSEC_diffusion.png" height="400">
+
+To rename clusters in the Single Cell Experiment object:
+
+```R
+LSECs.sc@colData$seurat_clusters=gsub('1','Periportal',LSECs.sc@colData$seurat_clusters)
+```
 
 Next, see the [bigwig visualisation tutorial](https://github.com/CebolaLab/scRNA/tree/main/5.%20Bigwig%20visualisation).
 

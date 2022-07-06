@@ -84,6 +84,8 @@ plots & theme(legend.position = "top", ) & guides(color = guide_legend(nrow = 3,
 
 The next step is to read in a list of defined marker genes, here obtained from PangloaDB:
 
+### Marker gene expression and cluster annotation 
+
 ```R
 #Upload cell types markers and create a merged dataframe 
 markers=read.table('liver.markers',sep='\t')

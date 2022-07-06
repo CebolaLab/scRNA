@@ -102,6 +102,12 @@ for(x in unique(markers[,2])){
     liver.integrated[[name]]<-PercentageFeatureSet(liver.integrated,features = features, assay = 'RNA')
 }
 
+#Calculte the marker genes for each cluster
+#Find markers for every cluster compared to all remaining cells, report only the positive ones
+liver.cluster.markers <- FindAllMarkers(liver.integrated, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+cluster.markers=liver.cluster.markers %>%
+    group_by(cluster) %>%
+    slice_max(n = 5, order_by = avg_log2FC)
 ```
 
 Next, see the [pseudobulk count and bigwig visualisation integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/9.pseudobulk_counts_bigwigs).

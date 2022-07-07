@@ -1,17 +1,4 @@
-
-## 9. Pseudobulk RNA counts
-
-```bash
-#Save the cluster identity for each cell
-identity=as.data.frame(Idents(LSECs.no9))
-write.table(identity,'cell_identity.txt',sep='\t',quote=FALSE,row.names=TRUE,col.names=FALSE)
-
-#Generate the pseudobulk data and save
-pseudocount.LSEC=AggregateExpression(object=LSECs,slot="counts",assays="RNA")
-write.table(pseudocount.LSEC$RNA,'pseudo_counts_LSEC.txt',sep='\t',quote=FALSE,col.names=TRUE,row.names=TRUE)
-```
-
-## 10. Generate bigwigs and visualise data
+## 5. Bigwig visualisation 
 
 Here, we will generate bigwig files for each cell type. This will use `sinto` to subset bam files for each donor according to the cell type ID. Then, corresponding bam files will be merged and bigwigs generated using `deeptools` and `macs2`.
 
@@ -34,9 +21,9 @@ AAATGCCCAGCATGAG-1_1	monocyte
 
 You will need to know the order in which the donors were merged, e.g:
 
-_1 = donor 1 \\
-_2 = donor 2 \\
-_3 = donor 3 \\
+- _1 = donor 1 
+- _2 = donor 2 
+- _3 = donor 3 
 
 Here, we assume that each donor has a diretory, such that the following two files are visible:
 
@@ -68,10 +55,10 @@ sinto filterbarcodes -c cellIDs -b ${donors[$tid]}/outs/possorted_genome_bam.bam
 #-p is the number of processors
 ```
 
-Next, we will use sinto 
-
-
 **Merging bam files**
+
+The final step will require merging the split bam files according to cell type, followed by bigwig generation.
+
 ```bash
 #Create an array with the names of the clusters
 #Option 1 - use a file, here cell_types.txt with each cluster name on a new line

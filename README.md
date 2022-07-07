@@ -155,7 +155,7 @@ Here, we opt to process biological replicates independently and then integrate t
 #### Differential expression and pseudobulk expression  
 *TBC*
 
-Next, see the [donor integration tutorial](https://github.com/CebolaLab/scRNA/tree/main/8.donor_integration).
+Next, see [data preparation with CellRanger](https://github.com/CebolaLab/scRNA/tree/main/2.%20Data%20preparation%20with%20CellRanger).
 
 
 

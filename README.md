@@ -18,7 +18,7 @@ In this first Chapter 1, "Introduction to single-cell transcriptomics and the li
     - [Hepatic cell types](#Hepatic-cell-types) and marker genes
     - [Published liver scRNA-seq studies](#Published-Liver-scRNA-seq-studies)
     - [Methods for the analysis of scRNA-seq data](#Methods-for-the-analysis-of-scRNA-seq-data)
-    
+
 ## 1. Pipeline overview
 
 1. **Generate count matrix**: `CellRanger count` is used to generate count matrices with some initial filtering to remove empty droplets. 
@@ -26,15 +26,16 @@ In this first Chapter 1, "Introduction to single-cell transcriptomics and the li
 3. **Correct for ambient gene expression** `SoupX` is used to correct for ambient gene expression. 
 4. **QC filtering**: repeat the normalization and clustering with the corrected data. Identify and remove clusters of low-quality cells. Several rounds of pre-processing, clustering and filtering may be required.
 5. **DoubletFinder**: identify and remove droplets with doublets i.e. two (or more) cells using `doubletFinder`. 
-6. **Final clustering**: the cleaned data is processed for a final time and clusters are labelled using known marker genes. (Supervised and/or unsupervised clustering may be carried out). 
-7. **Integrate biological replicates**
-8. **Pseudo-bulk gene expression**
+6. **Integrate biological replicates**
+7. **Identify cell types according to cluster**
+8. **Generate pseudo-bulk gene expression**
+9. **Make bigwigs and expression visualise data**
 
 This pipeline has been developed by carefully reviewing current tools and best practises used in the analysis of 10X Genomics scRNA-seq data, as of March 2022. This Github will first present an overview of various available tools, followed by the Cebola Lab pipeline. Resources used are shown in the [References](#references) at the bottom of this page.
 
-## 2. Background
+## 2. The liver
 
-The background section will be split into (1) liver cell-types, (2) a summary of previous scRNA-seq studies of the liver and (3) background on the methods used to analyse scRNA-seq data.
+The background section will be split into (1) liver cell-types, (2) a summary of previous scRNA-seq studies of the liver.
 
 ### Hepatic cell types
 
@@ -63,7 +64,7 @@ These are summarised in Figure 10 from [MacParland et al. (2018)](https://www.na
 
 <img src="https://github.com/CebolaLab/scRNA/blob/main/Figures/MacParland_liver_schematic.png" width="800">
 
-> Marker genes  
+### Marker genes  
 
 Marker genes to distinguish each cell type are provided with this Github. The `xxxx` spreadsheet includes detailed information such as the sources and reported level of specificity. 
 
@@ -96,7 +97,7 @@ Briefly, studies in mice have also uncovered interesting mechanisms, including z
 
 Look at Xiong et al. 2019 (Landscape of intercellular crosstalk in healthy and NASH liver revealed by single-cell secretome gene analysis) and Terkelsen et al. (GSE145086).
 
-### Methods for the analysis of scRNA-seq data
+## 3. scRNA-seq analysis
 
 #### Alignment, demultiplexing and quantification
 

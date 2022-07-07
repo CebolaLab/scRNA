@@ -8,8 +8,8 @@ This scRNA-seq analysis tutorial is split into several chapters and will focus o
 1. Introduction to single-cell transcriptomics and the liver
 2. [Data preparation using cellranger](https://github.com/CebolaLab/scRNA/tree/main/2.%20Data%20preparation%20with%20CellRanger)
 3. [Individual dataset analysis](https://github.com/CebolaLab/scRNA/tree/main/3.%20Individual%20dataset%20analysis)
-4. [Donor integration](https://github.com/CebolaLab/scRNA/tree/main/4.%20Donor%20integration)
-5. [Pseudobulk counts and visualising bigwigs](https://github.com/CebolaLab/scRNA/tree/main/5.%20Pseudobulk%20counts%20and%20bigwig%20visualisation)
+4. [Donor integration, cell type identification and pseudocount data](https://github.com/CebolaLab/scRNA/tree/main/4.%20Donor%20integration)
+5. [Visualising bigwigs](https://github.com/CebolaLab/scRNA/tree/main/5.%20Pseudobulk%20counts%20and%20bigwig%20visualisation)
 
 In this first Chapter 1, "Introduction to single-cell transcriptomics and the liver", the following topics will be discussed:
 
@@ -18,15 +18,7 @@ In this first Chapter 1, "Introduction to single-cell transcriptomics and the li
     - [Hepatic cell types](#Hepatic-cell-types) and marker genes
     - [Published liver scRNA-seq studies](#Published-Liver-scRNA-seq-studies)
     - [Methods for the analysis of scRNA-seq data](#Methods-for-the-analysis-of-scRNA-seq-data)
-
-3. [Workspace setup](#3-Workspace-setup)
-
-6. [Secondary analysis](#6-Secondary-analysis)
-7. [Cell type identity](#7-cell-type-identity)
-8. [Samples integration](#8-Sample-integration)
-9. [Pseudobulk RNA counts](#9-Pseudobulk-RNA-counts)
-10. [Generate bigwigs and visualise data](#10-Generate-bigwigs-and-visualise-data)
-
+    
 ## 1. Pipeline overview
 
 1. **Generate count matrix**: `CellRanger count` is used to generate count matrices with some initial filtering to remove empty droplets. 
